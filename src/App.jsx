@@ -9,9 +9,11 @@ import ContactUs from "./pages/ContactUs";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Footer from "./components/Footer";
+import Header from "./components/Header";
 function App() {
   return (
     <BrowserRouter>
+      <Header/>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about-us" element={<AboutUs />} />
