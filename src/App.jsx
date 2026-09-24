@@ -1,4 +1,5 @@
 import React from "react";
+import './App.css';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import AboutUs from "./pages/AboutUs";
@@ -7,12 +8,10 @@ import Market from "./pages/Market";
 import ContactUs from "./pages/ContactUs";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
-import Header from "./components/Header";
 import Footer from "./components/Footer";
 function App() {
   return (
     <BrowserRouter>
-      <Header/>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about-us" element={<AboutUs />} />
