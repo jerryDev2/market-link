@@ -65,7 +65,7 @@ natural, trustworthy, and modern farming-market identity.
 ### Primary Font --- Poppins
 
 **Use for:** - H1--H3 headings - Navigation - Buttons - Section titles -
-Product names - Important labels
+ProductItem names - Important labels
 
 **Recommended weights:** - Poppins SemiBold --- `600` - Poppins Bold ---
 `700`
@@ -75,7 +75,7 @@ appearance.
 
 ### Body Font --- Inter
 
-**Use for:** - Paragraphs - Product descriptions - Form labels - Input
+**Use for:** - Paragraphs - ProductItem descriptions - Form labels - Input
 text - Prices - Supporting information
 
 **Recommended weights:** - Inter Regular --- `400` - Inter Medium ---
@@ -172,11 +172,11 @@ Poppins SemiBold - Use subtle hover transitions.
 
 ## 5. Cards
 
-### Product Card
+### ProductItem Card
 
 **Background:** `#FFFDF5`
 
-**Recommended elements:** - Product image - Product name - Category
+**Recommended elements:** - ProductItem image - ProductItem name - Category
 badge - Price - Quantity/unit - Add to Cart button - Favorite icon where
 needed
 
@@ -185,7 +185,7 @@ Minimal shadow - Comfortable internal spacing
 
 ### Category Card
 
-Use: - Light Green background - Product/category image - Deep Green
+Use: - Light Green background - ProductItem/category image - Deep Green
 heading - Short description - Harvest Gold CTA
 
 ### Farmer Card
@@ -309,9 +309,9 @@ Use bright, natural, authentic photography featuring:
 -   Farmers' markets
 -   Fresh produce baskets
 
-### Product Images
+### ProductItem Images
 
-Product images should ideally be:
+ProductItem images should ideally be:
 
 -   Clean
 -   Well-lit
@@ -379,7 +379,7 @@ Recommended structure:
 2.  Search
 3.  Category filters
 4.  Sort dropdown
-5.  Product grid
+5.  ProductItem grid
 6.  Pagination / Load More
 7.  Footer
 
@@ -458,7 +458,7 @@ Recommended:
 box-shadow: 0 4px 15px rgba(27, 94, 32, 0.08);
 ```
 
-Use shadows mainly for: - Product cards - Dropdowns - Modals - Floating
+Use shadows mainly for: - ProductItem cards - Dropdowns - Modals - Floating
 elements
 
 Avoid heavy shadows across the entire website.
