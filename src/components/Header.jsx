@@ -1,14 +1,12 @@
-import React from 'react'
-import { Link, NavLink, useNavigate } from 'react-router-dom';
-
+import React from "react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 
 function Header() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   return (
     <div className="w-full bg-white" style={{ fontFamily: "Poppins" }}>
       <header className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 border-b border-[#efefef] py-3">
         {/* <img src={Logo} alt="Destiny Mini Mart logo" width="150px" /> */}{" "}
-        <h1>Logo</h1>
         <form className="relative flex-1">
           <div className="flex w-full items-center gap-2 rounded-2xl bg-[#f0f0f0] pl-3 transition focus-within:bg-[#f7f1ee] focus-within:ring-2 focus-within:ring-[#DE541E]/20">
             <i className="fa-solid fa-magnifying-glass text-xl text-[#a3a3a3]"></i>
@@ -95,5 +93,3 @@ function Header() {
     </div>
   );
 }
-
-export default Header
