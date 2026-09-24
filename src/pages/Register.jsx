@@ -22,7 +22,7 @@ const marketHighlights = [
 
 function Register() {
   return (
-    <div className="min-h-screen bg-[#FFFDF5] px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
+    <div className="min-h-screen bg-[#FFFDF5] px-4 py-6 sm:px-6 lg:px-8 lg:py-10 hidden sm-block">
       <div className="mx-auto max-w-6xl overflow-hidden rounded-[28px] border border-[#E8F5E9] bg-white shadow-[0_25px_80px_rgba(27,94,32,0.08)]">
         <div className="grid lg:grid-cols-[1.05fr_0.95fr]">
           <section className="bg-[#A5D6A7] p-6 sm:p-8 lg:p-12">

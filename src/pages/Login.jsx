@@ -22,7 +22,7 @@ const marketHighlights = [
 
 function Login() {
   return (
-    <div className="min-h-screen bg-[#FFFDF5] px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
+    <div className="min-h-screen hidden sm-block bg-[#FFFDF5] px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
       <div className="mx-auto max-w-6xl overflow-hidden rounded-[28px] border border-[#E8F5E9] bg-white shadow-[0_25px_80px_rgba(27,94,32,0.08)]">
         <div className="grid lg:grid-cols-[1.05fr_0.95fr]">
           <section className="bg-[#A5D6A7] p-6 sm:p-8 lg:p-12">
@@ -102,10 +102,10 @@ function Login() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <input id="remember" type="checkbox" className="h-4 w-4 rounded border-[#2E7D32] text-[#1B5E20] focus:ring-[#2E7D32]" />
-                  <label htmlFor="remember" className="text-sm font-medium text-[#263238]">
+                  <label htmlFor="remember" className="text-sm font-medium text-[#2632=38]">
                     Remember me
                   </label>
-                </div>
+          </div>
                 <a href="#" className="text-sm font-semibold text-[#1B5E20] hover:text-[#154a1a]">
                   Forgot password?
                 </a>
