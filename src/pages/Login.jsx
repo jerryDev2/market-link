@@ -47,7 +47,7 @@ function Login() {
               </h1>
               <p className="mt-4 text-base leading-7 text-[#263238] sm:text-lg">
                 Discover nearby markets, browse weekly produce, reserve favorites for pickup, and support growers in your area.
-              </p>
+            </p>
             </div>
 
             <div className="mt-8 grid gap-4 sm:grid-cols-2">
