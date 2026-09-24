@@ -1,3 +1,5 @@
+import { NavLink } from "react-router-dom";
+
 function Header() {
   return (
     <header className="relative z-50 bg-[#1B5E20]">
@@ -40,41 +42,40 @@ function Header() {
 
         {/* Navigation */}
         <div className="hidden items-center gap-8 lg:flex">
-          <a
-            href="/"
-            className="relative font-['Poppins'] text-sm font-semibold text-white"
+          <NavLink
+            to="/"
+            className="relative font-['Poppins'] text-sm font-semibold text-white py-5 border-b-[2px] border-transparent"
           >
             Home
-            <span className="absolute -bottom-[22px] left-0 h-[3px] w-full rounded-full bg-[#F9C74F]" />
-          </a>
+          </NavLink>
 
-          <a
-            href="/shop"
-            className="font-['Poppins'] text-sm font-medium text-white/90 transition hover:text-[#F9C74F]"
+          <NavLink
+            to="/shop"
+            className="font-['Poppins'] text-sm font-medium text-white/90 transition hover:text-[#F9C74F] py-5 border-b-[2px] border-transparent"
           >
             Shop
-          </a>
+          </NavLink>
 
-          <a
-            href="/farmers"
-            className="font-['Poppins'] text-sm font-medium text-white/90 transition hover:text-[#F9C74F]"
+          <NavLink
+            to="/farmers"
+            className="font-['Poppins'] text-sm font-medium text-white/90 transition hover:text-[#F9C74F] py-5 border-b-[2px] border-transparent"
           >
             For Farmers
-          </a>
+          </NavLink>
 
-          <a
-            href="/about"
-            className="font-['Poppins'] text-sm font-medium text-white/90 transition hover:text-[#F9C74F]"
+          <NavLink
+            to="/about-us"
+            className="font-['Poppins'] text-sm font-medium text-white/90 transition hover:text-[#F9C74F] py-5 border-b-[2px] border-transparent"
           >
-            About
-          </a>
+            About Us
+          </NavLink>
 
-          <a
-            href="/contact"
-            className="font-['Poppins'] text-sm font-medium text-white/90 transition hover:text-[#F9C74F]"
+          <NavLink
+            to="/contact-us"
+            className="font-['Poppins'] text-sm font-medium text-white/90 transition hover:text-[#F9C74F] py-5 border-b-[2px] border-transparent"
           >
-            Contact
-          </a>
+            Contact Us
+          </NavLink>
         </div>
 
         {/* Right side */}

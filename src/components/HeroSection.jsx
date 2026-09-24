@@ -1,11 +1,13 @@
+import background from "../assets/images/background1.jpg";
+
 function HeroSection() {
   return (
     <section className="overflow-hidden bg-[#FFFDF5]">
-      <div className="relative mx-auto min-h-[650px] max-w-[1400px] overflow-hidden">
+      <div className="relative mx-auto min-h-[650px] overflow-hidden">
         {/* Decorative background */}
-        <div className="pointer-events-none absolute -right-40 -top-40 h-[500px] w-[500px] rounded-full bg-[#E8F5E9]" />
+        {/* <div className="pointer-events-none absolute -right-40 -top-40 h-[500px] w-[500px] rounded-full bg-[#E8F5E9]" />
 
-        <div className="pointer-events-none absolute -bottom-48 -left-40 h-[500px] w-[500px] rounded-full bg-[#A5D6A7]/30" />
+        <div className="pointer-events-none absolute -bottom-48 -left-40 h-[500px] w-[500px] rounded-full bg-[#A5D6A7]/30" /> */}
 
         <div className="relative grid min-h-[650px] lg:grid-cols-[0.92fr_1.08fr]">
           {/* ================= LEFT CONTENT ================= */}
@@ -103,13 +105,13 @@ function HeroSection() {
           <div className="relative min-h-[480px] lg:min-h-full">
             <div className="absolute inset-0">
               <img
-                src="/src/assets/homepage-images/home-img1.png"
+                src={background}
                 alt="Local farmer holding freshly harvested produce"
-                className="h-full w-full object-contain"
+                className="h-full w-full object-cover"
               />
 
               {/* Soft blend into content */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#FFFDF5] via-transparent to-transparent lg:w-1/3" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#FFFDF5]  to-transparent lg:w-1/3" />
 
               <div className="absolute inset-0 bg-gradient-to-t from-[#1B5E20]/25 via-transparent to-transparent" />
             </div>
