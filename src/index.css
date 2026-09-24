@@ -42,3 +42,7 @@ select {
 * {
   box-sizing: border-box;
 }
+
+a.active {
+border-bottom: 2px solid #f9c74f;
+}
