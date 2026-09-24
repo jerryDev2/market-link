@@ -1,6 +1,6 @@
 import React from 'react'
 import HeroSection from '../components/HeroSection'
-import Avert from '../components/Avert'
+import Avert from '../components/Advert'
 import HowToUseMarketLink from '../components/HowToUseMarketLink'
 import Categories from '../components/Categories'
 import FreshProduct from '../components/FreshProduct'

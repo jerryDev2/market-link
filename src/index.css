@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap');
-@import 'tailwindcss';
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap");
+@import "tailwindcss";
 
 :root {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   color: #263238;
-  background: #FFFDF5;
+  background: #fffdf5;
   line-height: 1.5;
   font-weight: 400;
   font-synthesis: none;
@@ -21,8 +21,8 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: #FFFDF5;
-  font-family: 'Inter', sans-serif;
+  background: #fffdf5;
+  font-family: "Inter", sans-serif;
 }
 
 h1,
@@ -36,9 +36,13 @@ nav,
 label,
 input,
 select {
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
 * {
   box-sizing: border-box;
+}
+
+a.active {
+border-bottom: 2px solid #f9c74f;
 }
