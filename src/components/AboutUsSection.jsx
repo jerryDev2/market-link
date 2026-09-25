@@ -2,14 +2,14 @@ import { Link } from "react-router-dom";
 
 function AboutUsSection() {
   return (
-    <section className="relative overflow-hidden bg-[#E8F5E9] py-20 sm:py-24">
+    <section className="relative overflow-hidden bg-[#FFFDF5] py-20 sm:py-24">
       <div className="relative mx-auto max-w-[1200px] px-5 sm:px-8 lg:px-10">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
           {/* Image Side */}
           <div className="relative">
             <div className="relative overflow-hidden rounded-[24px]">
               <img
-                src="/images/about-market.jpg"
+                src="/images/about-us2.jpg"
                 alt="Local farmer with fresh farm produce"
                 className="h-[380px] w-full object-cover sm:h-[450px]"
               />
@@ -85,7 +85,7 @@ function AboutUsSection() {
             {/* Brand values */}
             <div className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div>
-                <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-white text-[#1B5E20]">
+                <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-[#F9C74F] text-[#1B5E20]">
                   ✓
                 </div>
                 <p className="font-['Poppins'] text-sm font-semibold text-[#1B5E20]">
@@ -94,7 +94,7 @@ function AboutUsSection() {
               </div>
 
               <div>
-                <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-white text-[#1B5E20]">
+                <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-[#F9C74F] text-[#1B5E20]">
                   ✓
                 </div>
                 <p className="font-['Poppins'] text-sm font-semibold text-[#1B5E20]">
@@ -103,7 +103,7 @@ function AboutUsSection() {
               </div>
 
               <div>
-                <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-white text-[#1B5E20]">
+                <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-[#F9C74F] text-[#1B5E20]">
                   ✓
                 </div>
                 <p className="font-['Poppins'] text-sm font-semibold text-[#1B5E20]">
