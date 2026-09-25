@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import background from "../assets/images/background1.jpg";
 
 function HeroSection() {
@@ -42,25 +43,25 @@ function HeroSection() {
 
             {/* CTA Buttons */}
             <div className="mt-9 flex flex-wrap items-center gap-4">
-              <a
-                href="/shop"
+              <Link
+                to="/product"
                 className="group flex items-center gap-3 rounded-xl bg-[#1B5E20] px-7 py-3.5 font-['Poppins'] text-sm font-semibold text-white shadow-[0_8px_20px_rgba(27,94,32,0.18)] transition duration-300 hover:-translate-y-1 hover:bg-[#145218] hover:shadow-[0_12px_25px_rgba(27,94,32,0.25)]"
               >
                 Shop Fresh Produce
                 <span className="transition-transform duration-300 group-hover:translate-x-1">
                   →
                 </span>
-              </a>
+              </Link>
 
-              <a
-                href="/farmers"
+              <Link
+                to="/about-us"
                 className="group flex items-center gap-2 rounded-xl border-[1.5px] border-[#1B5E20] px-7 py-3.5 font-['Poppins'] text-sm font-semibold text-[#1B5E20] transition duration-300 hover:bg-[#E8F5E9]"
               >
-                Meet Our Farmers
+                Explore More
                 <span className="transition-transform duration-300 group-hover:translate-x-1">
                   →
                 </span>
-              </a>
+              </Link>
             </div>
 
             {/* Trust indicators */}
