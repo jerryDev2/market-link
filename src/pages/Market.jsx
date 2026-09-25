@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 const navItems = ["Home", "Shop", "For Farmers", "About", "Contact"];
 
 const harvestCategories = [
@@ -43,9 +44,9 @@ const moreHarvestCategories = [
     name: "Livestock",
     description: "Quality livestock, live catfish and fresh farm meat.",
     image:
-      "https://images.unsplash.com/photo-1551884831-bbf3cdc6469e?auto=format&fit=crop&w=900&q=85",
+      "https://images.unsplash.com/photo-1526625397487-978d689d30b5?auto=format&fit=crop&w=900&q=85",
     badgeImage:
-      "https://images.unsplash.com/photo-1551884831-bbf3cdc6469e?auto=format&fit=crop&w=160&q=85",
+      "https://images.unsplash.com/photo-1526625397487-978d689d30b5?auto=format&fit=crop&w=160&q=85",
   },
   {
     name: "Grains",
@@ -86,30 +87,6 @@ const additionalHarvestCategories = [
   },
 ];
 
-const processSteps = [
-  {
-    number: "1",
-    title: "Explore Farm Produce",
-    description:
-      "Browse our real-time 50 product catalog with verified farmer identities, exact harvest dates, and transparent naira pricing.",
-    color: "bg-[#e4f2e6]",
-  },
-  {
-    number: "2",
-    title: "Secure Escrow Order",
-    description:
-      "Place orders with buyer protection escrow. Funds are only remitted to the farmer once your produce arrives in prime condition.",
-    color: "bg-[#fac449]",
-  },
-  {
-    number: "3",
-    title: "Cold Dispatch Delivery",
-    description:
-      "Enjoy reliable doorstep cold logistics straight from the farm, retaining nutrients, color, and garden-fresh taste.",
-    color: "bg-[#a6d6a9]",
-  },
-];
-
 const verifiedFarmers = [
   {
     name: "Emeka's Farm Co-op",
@@ -144,6 +121,40 @@ const verifiedFarmers = [
     reviews: "98",
     image: "/images/community.jfif",
   },
+  {
+    name: "Amina's Green Fields",
+    proprietor: "Amina Bello",
+    location: "Kaduna, Kaduna State",
+    description:
+      "Growing clean leafy vegetables and seasonal peppers with water-smart farming methods.",
+    produce: ["Spinach", "Scotch Bonnet", "Okra"],
+    rating: "4.8",
+    reviews: "156",
+    image: "/images/fresh produce.jfif",
+  },
+  {
+    name: "Chukwuemeka Heritage Farm",
+    proprietor: "Chukwuemeka Nwosu",
+    location: "Enugu, Enugu State",
+    description:
+      "A family-run farm producing naturally ripened fruits, root crops and traditional staples.",
+    produce: ["Pineapples", "Cassava", "Plantain"],
+    rating: "4.7",
+    reviews: "87",
+    image:
+      "https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=900&q=85",
+  },
+  {
+    name: "Bassey Coastal Produce",
+    proprietor: "Imaobong Bassey",
+    location: "Uyo, Akwa Ibom State",
+    description:
+      "Supplying fresh coastal harvests and responsibly raised farm goods to local families.",
+    produce: ["Waterleaf", "Garden Eggs", "Fresh Fish"],
+    rating: "4.9",
+    reviews: "143",
+    image: "/images/showcase.jfif",
+  },
 ];
 
 const farmerBenefits = [
@@ -165,6 +176,18 @@ const farmerBenefits = [
 ];
 function Market() {
   const [showMoreCategories, setShowMoreCategories] = useState(false);
+  const [selectedFarmer, setSelectedFarmer] = useState(null);
+
+  useEffect(() => {
+    const exploreSection = document.getElementById("explore-fresh-harvests");
+
+    if (exploreSection) {
+      window.scrollTo({
+        top: Math.max(exploreSection.offsetTop - 88, 0),
+        behavior: "auto",
+      });
+    }
+  }, []);
 
   return (
     <main className="min-h-screen bg-[#dfe8d5] text-[#193d2c]">
@@ -248,7 +271,10 @@ function Market() {
         </div>
       </section>
 
-      <section className="border-t border-[#e2e9dc] bg-[#fffdf5] px-5 py-10 lg:px-8 xl:px-12">
+      <section
+        id="explore-fresh-harvests"
+        className="border-t border-[#e2e9dc] bg-[#fffdf5] px-5 py-10 lg:px-8 xl:px-12"
+      >
         <div className="mx-auto max-w-[1250px]">
           <div className="mb-8 flex items-end justify-between gap-6">
             <div>
@@ -339,8 +365,17 @@ function Market() {
             ))}
           </div>
 
-          {showMoreCategories && (
-            <div className="mt-6 grid gap-6 md:grid-cols-3">
+          <AnimatePresence initial={false}>
+            {showMoreCategories && (
+              <motion.div
+                key="additional-harvest-categories"
+                initial={{ height: 0, opacity: 0, y: 36 }}
+                animate={{ height: "auto", opacity: 1, y: 0 }}
+                exit={{ height: 0, opacity: 0, y: 36 }}
+                transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+                className="overflow-hidden"
+              >
+                <div className="mt-6 grid gap-6 md:grid-cols-3">
               {additionalHarvestCategories.map((category) => (
                 <article
                   key={category.name}
@@ -373,55 +408,19 @@ function Market() {
                   </div>
                 </article>
               ))}
-            </div>
-          )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <div className="mt-10 flex justify-center">
             <button
               type="button"
               onClick={() => setShowMoreCategories((current) => !current)}
-              className="rounded-[12px] bg-[#fac449] px-7 py-3 text-[0.95rem] font-black text-[#173d2b] transition hover:bg-[#12642e] hover:text-white"
+              className="rounded-[12px] bg-[#fac449] px-7 py-3 text-[0.95rem] font-black text-[#173d2b] transition hover:bg-[#d79f27] hover:text-[#173d2b]"
             >
               {showMoreCategories ? "Show Less ↑" : "Load More Categories ↓"}
             </button>
-          </div>
-        </div>
-      </section>
-
-      <section className="border-t border-[#dce9d9] bg-[#f1f8ed] px-5 py-16 lg:px-8 xl:px-12">
-        <div className="mx-auto max-w-[1150px]">
-          <div className="mx-auto max-w-[680px] text-center">
-            <p className="text-[0.72rem] font-bold uppercase tracking-[0.16em] text-[#12642e]">
-              Transparent Agricultural Commerce
-            </p>
-            <h2 className="mt-2 text-[2rem] font-black leading-none tracking-[-0.04em] text-[#12642e] sm:text-[2.25rem]">
-              How Farmer&apos;s MarketLink Works
-            </h2>
-            <p className="mt-3 text-[0.95rem] text-[#617968]">
-              We make farm-gate purchasing effortless, secure, and beneficial
-              for both growers and households.
-            </p>
-          </div>
-
-          <div className="mt-11 grid gap-6 md:grid-cols-3">
-            {processSteps.map((step) => (
-              <article
-                key={step.number}
-                className="min-h-[195px] rounded-[15px] border border-[#e0eade] bg-[#fffdf5] px-6 py-5 text-center shadow-[0_2px_5px_rgba(18,100,46,0.06)]"
-              >
-                <div
-                  className={`mx-auto flex h-12 w-12 items-center justify-center rounded-[14px] text-[1.2rem] font-black text-[#12642e] ${step.color}`}
-                >
-                  {step.number}
-                </div>
-                <h3 className="mt-4 text-[1rem] font-black text-[#142d22]">
-                  {step.title}
-                </h3>
-                <p className="mt-3 text-[0.75rem] leading-[1.55] text-[#6a7d70]">
-                  {step.description}
-                </p>
-              </article>
-            ))}
           </div>
         </div>
       </section>
@@ -500,7 +499,11 @@ function Market() {
                     <strong className="text-[#fac449]">★</strong>{" "}
                     {farmer.rating} ({farmer.reviews})
                   </span>
-                  <button className="rounded-[10px] border border-[#12642e] px-4 py-2 text-[0.72rem] font-bold text-[#12642e] transition hover:bg-[#12642e] hover:text-white">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedFarmer(farmer)}
+                    className="rounded-[10px] border border-[#12642e] px-4 py-2 text-[0.72rem] font-bold text-[#12642e] transition hover:bg-[#12642e] hover:text-white"
+                  >
                     View Profile →
                   </button>
                 </div>
@@ -552,76 +555,78 @@ function Market() {
         </div>
       </section>
 
-      <footer className="bg-[#176326] px-5 py-10 text-white lg:px-8 xl:px-12">
-        <div className="mx-auto max-w-[1150px]">
-          <div className="flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[11px] bg-[#fac449] text-xl text-[#176326]">
-                ✣
-              </div>
+      {selectedFarmer && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-[#102c1b]/60 px-5 py-8 backdrop-blur-sm"
+          role="presentation"
+          onClick={() => setSelectedFarmer(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="farmer-profile-title"
+            className="relative w-full max-w-[520px] rounded-[20px] bg-[#fffdf5] p-7 text-[#193d2c] shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              aria-label="Close farmer profile"
+              onClick={() => setSelectedFarmer(null)}
+              className="absolute right-5 top-4 text-2xl text-[#537060] transition hover:text-[#12642e]"
+            >
+              ×
+            </button>
+            <div className="flex items-center gap-4">
+              <img
+                src={selectedFarmer.image}
+                alt={selectedFarmer.name}
+                className="h-20 w-20 rounded-[14px] object-cover"
+              />
               <div>
-                <div className="text-[1.15rem] font-black leading-none">
-                  Farmer&apos;s MarketLink
-                </div>
-                <p className="mt-1 text-[0.62rem] text-[#cce9c8]">
-                  Fresh Produce • Local Farmers • Better Communities
+                <span className="rounded-full bg-[#dff1df] px-2.5 py-1 text-xs font-bold text-[#12642e]">
+                  ✓ Verified Farmer
+                </span>
+                <h2
+                  id="farmer-profile-title"
+                  className="mt-2 text-xl font-black text-[#12642e]"
+                >
+                  {selectedFarmer.name}
+                </h2>
+                <p className="mt-1 text-sm text-[#617968]">
+                  {selectedFarmer.location}
                 </p>
               </div>
             </div>
-
-            <nav className="flex flex-wrap gap-x-6 gap-y-3 text-[0.75rem] font-semibold text-[#f1f8ed]">
-              <a href="#" className="transition hover:text-[#fac449]">
-                Home
-              </a>
-              <a href="#" className="transition hover:text-[#fac449]">
-                Shop Produce
-              </a>
-              <a href="#" className="transition hover:text-[#fac449]">
-                For Farmers
-              </a>
-              <a href="#" className="transition hover:text-[#fac449]">
-                About Us
-              </a>
-              <a href="#" className="transition hover:text-[#fac449]">
-                Contact Us
-              </a>
-            </nav>
-
-            <div className="flex gap-2">
-              {["f", "◎", "𝕏", "▶"].map((social) => (
-                <a
-                  key={social}
-                  href="#"
-                  aria-label="Social media"
-                  className="flex h-8 w-8 items-center justify-center rounded-[8px] bg-white/10 text-[0.75rem] font-bold text-white transition hover:bg-[#fac449] hover:text-[#176326]"
-                >
-                  {social}
-                </a>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-8 flex flex-col gap-4 border-t border-white/20 pt-5 text-[0.68rem] text-[#cce9c8] md:flex-row md:items-center md:justify-between">
-            <p>
-              © 2026 Farmer&apos;s MarketLink. All rights reserved. Connecting
-              Nigerian growers with families and communities.
+            <p className="mt-6 text-sm leading-6 text-[#536c5d]">
+              {selectedFarmer.description}
             </p>
-            <div className="flex flex-wrap gap-x-5 gap-y-2 font-semibold">
-              <a href="#" className="transition hover:text-white">
-                Verified Escrow Trade
-              </a>
-              <span>•</span>
-              <a href="#" className="transition hover:text-white">
-                Cold Chain Guarantee
-              </a>
-              <span>•</span>
-              <a href="#" className="transition hover:text-white">
-                Purity Standards
-              </a>
+            <div className="mt-5 border-t border-[#e1e9dd] pt-4">
+              <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#617968]">
+                Main farm produce
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {selectedFarmer.produce.map((item) => (
+                  <span
+                    key={item}
+                    className="rounded-full bg-[#e7f3e5] px-3 py-1 text-xs font-medium text-[#34704b]"
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div className="mt-5 flex items-center justify-between text-sm text-[#617968]">
+              <span>
+                <strong className="text-[#fac449]">★</strong>{" "}
+                {selectedFarmer.rating} ({selectedFarmer.reviews} reviews)
+              </span>
+              <span className="font-semibold">
+                Proprietor: {selectedFarmer.proprietor}
+              </span>
             </div>
           </div>
         </div>
-      </footer>
+      )}
     </main>
   );
 }
