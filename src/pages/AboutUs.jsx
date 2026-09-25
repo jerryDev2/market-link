@@ -176,7 +176,7 @@ function AboutUs() {
       {/* The Solution */}
       <div className="px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <div className="mx-auto max-w-6xl">
-          <div className="rounded-[30px] border border-[#E8F5E9] bg-linear-to-br from-[#A5D6A7] to-[#81C784] p-6 sm:p-8 lg:p-12 shadow-[0_25px_80px_rgba(27,94,32,0.08)]">
+          <div className="rounded-[30px] border border-[#E8F5E9] bg-[#a5d6a73a] p-6 sm:p-8 lg:p-12 shadow-[0_25px_80px_rgba(27,94,32,0.08)]">
             <div className="mb-8 text-center">
               <h2 className="text-3xl font-bold text-[#1B5E20] sm:text-4xl">
                 Our Solution: MarketLink
@@ -311,7 +311,7 @@ function AboutUs() {
       {/* CTA Section */}
       <div className="px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <div className="mx-auto max-w-4xl text-center">
-          <div className="rounded-[28px] border border-[#E8F5E9] bg-[#A5D6A7] p-6 sm:p-8 lg:p-12 shadow-[0_25px_80px_rgba(27,94,32,0.08)]">
+          <div className="rounded-[28px] border border-[#E8F5E9] bg-[#a5d6a73a] p-6 sm:p-8 lg:p-12 shadow-[0_25px_80px_rgba(27,94,32,0.08)]">
             <h2 className="text-3xl font-bold text-[#1B5E20] sm:text-4xl">
               Join the Local Movement
             </h2>
