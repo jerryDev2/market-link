@@ -10,6 +10,7 @@ import Footer from "./components/Footer";
 import Header from "./components/Header";
 import Register from "./pages/Register";
 import FarmerProfile from "./pages/FarmerProfile";
+import Home from "./pages/Home";
 import FarmerDashboard from "./pages/FarmerDashboard";
 
 function App() {
@@ -23,7 +24,7 @@ function App() {
         <Route path="/market" element={<Market />} />
         <Route path="/contact-us" element={<ContactUs />} />
         <Route path="/signup" element={<Register />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/register" element={<Register />} />``
         <Route path="/login" element={<Login />} />
         <Route path="/farmer-profile" element={<FarmerProfile />} />
         <Route path="/farmer-dashboard" element={<FarmerDashboard />} />
