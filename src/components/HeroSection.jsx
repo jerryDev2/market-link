@@ -1,11 +1,14 @@
+import { Link } from "react-router-dom";
+import background from "../assets/images/background1.jpg";
+
 function HeroSection() {
   return (
     <section className="overflow-hidden bg-[#FFFDF5]">
-      <div className="relative mx-auto min-h-[650px] max-w-[1400px] overflow-hidden">
+      <div className="relative mx-auto min-h-[650px] overflow-hidden">
         {/* Decorative background */}
-        <div className="pointer-events-none absolute -right-40 -top-40 h-[500px] w-[500px] rounded-full bg-[#E8F5E9]" />
+        {/* <div className="pointer-events-none absolute -right-40 -top-40 h-[500px] w-[500px] rounded-full bg-[#E8F5E9]" />
 
-        <div className="pointer-events-none absolute -bottom-48 -left-40 h-[500px] w-[500px] rounded-full bg-[#A5D6A7]/30" />
+        <div className="pointer-events-none absolute -bottom-48 -left-40 h-[500px] w-[500px] rounded-full bg-[#A5D6A7]/30" /> */}
 
         <div className="relative grid min-h-[650px] lg:grid-cols-[0.92fr_1.08fr]">
           {/* ================= LEFT CONTENT ================= */}
@@ -40,25 +43,25 @@ function HeroSection() {
 
             {/* CTA Buttons */}
             <div className="mt-9 flex flex-wrap items-center gap-4">
-              <a
-                href="/shop"
+              <Link
+                to="/product"
                 className="group flex items-center gap-3 rounded-xl bg-[#1B5E20] px-7 py-3.5 font-['Poppins'] text-sm font-semibold text-white shadow-[0_8px_20px_rgba(27,94,32,0.18)] transition duration-300 hover:-translate-y-1 hover:bg-[#145218] hover:shadow-[0_12px_25px_rgba(27,94,32,0.25)]"
               >
                 Shop Fresh Produce
                 <span className="transition-transform duration-300 group-hover:translate-x-1">
                   →
                 </span>
-              </a>
+              </Link>
 
-              <a
-                href="/farmers"
+              <Link
+                to="/about-us"
                 className="group flex items-center gap-2 rounded-xl border-[1.5px] border-[#1B5E20] px-7 py-3.5 font-['Poppins'] text-sm font-semibold text-[#1B5E20] transition duration-300 hover:bg-[#E8F5E9]"
               >
-                Meet Our Farmers
+                Explore More
                 <span className="transition-transform duration-300 group-hover:translate-x-1">
                   →
                 </span>
-              </a>
+              </Link>
             </div>
 
             {/* Trust indicators */}
@@ -103,13 +106,13 @@ function HeroSection() {
           <div className="relative min-h-[480px] lg:min-h-full">
             <div className="absolute inset-0">
               <img
-                src="/src/assets/homepage-images/home-img1.png"
+                src={background}
                 alt="Local farmer holding freshly harvested produce"
-                className="h-full w-full object-contain"
+                className="h-full w-full object-cover"
               />
 
               {/* Soft blend into content */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#FFFDF5] via-transparent to-transparent lg:w-1/3" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#FFFDF5]  to-transparent lg:w-1/3" />
 
               <div className="absolute inset-0 bg-gradient-to-t from-[#1B5E20]/25 via-transparent to-transparent" />
             </div>
