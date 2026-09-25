@@ -1,11 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap");
 @import "tailwindcss";
 
-
 :root {
-    --color-pry: #1B5E20;
-    --color-sec: #A5D6A7;
-    --color-gold: #F9C74F;
-    --color-cream: #FFFDF5;
-    --color-text: #263238;
+  --color-pry: #1b5e20;
+  --color-sec: #a5d6a7;
+  --color-gold: #f9c74f;
+  --color-cream: #fffdf5;
+  --color-text: #263238;
+  --color-light-green: #a5d6a7;
+  --color-light-gray: #e8f5e9;
+  --color-border: #e8f5e9;
+  --color-success: #2e7d32;
+}
+
+body {
+  margin: 0;
+  background: var(--color-cream);
+  color: var(--color-text);
+  font-family: "Inter", sans-serif;
 }
