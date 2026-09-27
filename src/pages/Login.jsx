@@ -1,5 +1,5 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const marketHighlights = [
   {
@@ -23,6 +23,84 @@ const marketHighlights = [
 ];
 
 function Login() {
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
+  const [notice, setNotice] = useState({ type: "", message: "" });
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (notice.message) {
+      setNotice({ type: "", message: "" });
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const { email, password } = formData;
+
+    if (!email.trim() || !password) {
+      setNotice({
+        type: "error",
+        message: "Please enter your email and password.",
+      });
+      return;
+    }
+
+    setLoading(true);
+    setNotice({ type: "", message: "" });
+
+    try {
+      const response = await fetch("http://localhost:8080/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+      console.log("LOGIN RESPONSE:", data);
+      console.log("LOGIN USER:", data.user);
+      console.log("LOGIN ROLE:", data.user?.role);
+      console.log("LOGIN TOKEN:", data.token);
+
+      if (!response.ok) {
+        console.log("LOGIN BACKEND RESPONSE:", data);
+        throw new Error(
+          data.message || data.error || "Invalid email or password.",
+        );
+      }
+
+      if (!data.user) {
+        throw new Error("No user returned from the server.");
+      }
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      const userRole = data.user?.role?.toUpperCase();
+
+      if (userRole === "CUSTOMER") {
+        window.location.href = "/";
+      } else if (userRole === "FARMER") {
+        window.location.href = "/farmer-dashboard";
+      } else {
+        window.location.href = "/";
+      }
+    } catch (error) {
+      console.error("login error:", error);
+
+      setNotice({
+        type: "error",
+        message: error.message || "Something went wrong during login.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#FFFDF5] px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
       <div className="mx-auto max-w-6xl overflow-hidden rounded-[28px] border border-[#E8F5E9] bg-white shadow-[0_25px_80px_rgba(27,94,32,0.08)]">
@@ -90,7 +168,19 @@ function Login() {
               </span>
             </div>
 
-            <form className="mt-8 space-y-5">
+            {notice.message ? (
+              <div
+                className={`mt-6 rounded-xl border px-4 py-3 text-sm font-medium ${
+                  notice.type === "success"
+                    ? "border-[#C8E6C9] bg-[#E8F5E9] text-[#1B5E20]"
+                    : "border-[#F8D7DA] bg-[#FFF1F2] text-[#B42318]"
+                }`}
+              >
+                {notice.message}
+              </div>
+            ) : null}
+
+            <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
               <div>
                 <label
                   htmlFor="email"
@@ -100,7 +190,10 @@ function Login() {
                 </label>
                 <input
                   id="email"
+                  name="email"
                   type="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   placeholder="you@example.com"
                   className="w-full rounded-xl border border-[#E8F5E9] bg-white px-4 py-3 text-base text-[#263238] placeholder:text-[#263238]/45 focus:border-[#2E7D32] focus:outline-none focus:ring-2 focus:ring-[#2E7D32]/20"
                 />
@@ -115,7 +208,10 @@ function Login() {
                 </label>
                 <input
                   id="password"
+                  name="password"
                   type="password"
+                  value={formData.password}
+                  onChange={handleChange}
                   placeholder="Enter your password"
                   className="w-full rounded-xl border border-[#E8F5E9] bg-white px-4 py-3 text-base text-[#263238] placeholder:text-[#263238]/45 focus:border-[#2E7D32] focus:outline-none focus:ring-2 focus:ring-[#2E7D32]/20"
                 />
@@ -130,7 +226,7 @@ function Login() {
                   />
                   <label
                     htmlFor="remember"
-                    className="text-sm font-medium text-[#2632=38]"
+                    className="text-sm font-medium text-[#263238]"
                   >
                     Remember me
                   </label>
@@ -145,9 +241,10 @@ function Login() {
 
               <button
                 type="submit"
-                className="w-full rounded-xl bg-[#1B5E20] px-5 py-3.5 text-base font-semibold text-white transition hover:bg-[#154a1a] focus:outline-none focus:ring-4 focus:ring-[#1B5E20]/20"
+                disabled={loading}
+                className="w-full rounded-xl bg-[#1B5E20] px-5 py-3.5 text-base font-semibold text-white transition hover:bg-[#154a1a] focus:outline-none focus:ring-4 focus:ring-[#1B5E20]/20 disabled:cursor-not-allowed disabled:opacity-70"
               >
-                Sign in
+                {loading ? "Signing in..." : "Sign in"}
               </button>
             </form>
 

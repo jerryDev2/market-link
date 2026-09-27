@@ -1,5 +1,21 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
+const validatePassword = (password) => {
+  if (password.length < 8) {
+    return "Password must be at least 8 characters long.";
+  }
+
+  if (!/[A-Z]/.test(password)) {
+    return "Password must include at least one capital letter.";
+  }
+
+  if (!/\d/.test(password)) {
+    return "Password must include at least one number.";
+  }
+
+  return "";
+};
 
 const marketHighlights = [
   {
@@ -23,7 +39,137 @@ const marketHighlights = [
 ];
 
 function Register() {
-  const [role, setRole] = useState("CUSTOMER")
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phoneNumber: "",
+    role: "CUSTOMER",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const [passwordError, setPasswordError] = useState("");
+  const [notice, setNotice] = useState({ type: "", message: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    if (notice.message) {
+      setNotice({ type: "", message: "" });
+    }
+
+    if (passwordError) {
+      setPasswordError("");
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const {
+      firstName,
+      lastName,
+      email,
+      phoneNumber,
+      role,
+      password,
+      confirmPassword,
+    } = formData;
+
+    if (
+      !firstName.trim() ||
+      !lastName.trim() ||
+      !email.trim() ||
+      !phoneNumber.trim() ||
+      !role ||
+      !password ||
+      !confirmPassword
+    ) {
+      setNotice({
+        type: "error",
+        message: "Please fill in all the required information.",
+      });
+      return;
+    }
+
+    const passwordValidationMessage = validatePassword(password);
+    if (passwordValidationMessage) {
+      setPasswordError(passwordValidationMessage);
+      setNotice({ type: "error", message: passwordValidationMessage });
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setPasswordError("Your password does not match.");
+      setNotice({ type: "error", message: "Your password does not match." });
+      return;
+    }
+
+    setPasswordError("");
+    setNotice({ type: "", message: "" });
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("http://localhost:8080/api/user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error("Something went wrong. Please try again.");
+      }
+
+      if (!data?.user) {
+        throw new Error("No user was returned from the server.");
+      }
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      window.dispatchEvent(new Event("auth-change"));
+
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phoneNumber: "",
+        role: "CUSTOMER",
+        password: "",
+        confirmPassword: "",
+      });
+
+      const userRole = data.user?.role?.toUpperCase();
+
+      setNotice({
+        type: "success",
+        message: "Account created successfully! Redirecting...",
+      });
+
+      if (userRole === "CUSTOMER") {
+        navigate("/");
+      } else if (userRole === "FARMER") {
+        navigate("/farmer-dashboard");
+      }
+    } catch (error) {
+      console.error("signup error:", error);
+      setNotice({
+        type: "error",
+        message: error.message || "Something went wrong during signup.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   return (
     <div className="min-h-screen bg-[#FFFDF5] px-4 py-6 sm:px-6 lg:px-8 lg:py-10 ">
       <div className="mx-auto max-w-6xl overflow-hidden rounded-[28px] border border-[#E8F5E9] bg-white shadow-[0_25px_80px_rgba(27,94,32,0.08)]">
@@ -91,7 +237,19 @@ function Register() {
               </span>
             </div>
 
-            <form className="mt-8 space-y-5">
+            {notice.message ? (
+              <div
+                className={`mt-6 rounded-xl border px-4 py-3 text-sm font-medium ${
+                  notice.type === "success"
+                    ? "border-[#C8E6C9] bg-[#E8F5E9] text-[#1B5E20]"
+                    : "border-[#F8D7DA] bg-[#FFF1F2] text-[#B42318]"
+                }`}
+              >
+                {notice.message}
+              </div>
+            ) : null}
+
+            <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
                   <label
@@ -101,7 +259,10 @@ function Register() {
                     First name
                   </label>
                   <input
+                    value={formData.firstName}
+                    onChange={handleChange}
                     id="firstName"
+                    name="firstName"
                     type="text"
                     placeholder="Alicia"
                     className="w-full rounded-xl border border-[#E8F5E9] bg-white px-4 py-3 text-base text-[#263238] placeholder:text-[#263238]/45 focus:border-[#2E7D32] focus:outline-none focus:ring-2 focus:ring-[#2E7D32]/20"
@@ -116,7 +277,10 @@ function Register() {
                     Last name
                   </label>
                   <input
+                    value={formData.lastName}
+                    onChange={handleChange}
                     id="lastName"
+                    name="lastName"
                     type="text"
                     placeholder="Jones"
                     className="w-full rounded-xl border border-[#E8F5E9] bg-white px-4 py-3 text-base text-[#263238] placeholder:text-[#263238]/45 focus:border-[#2E7D32] focus:outline-none focus:ring-2 focus:ring-[#2E7D32]/20"
@@ -132,8 +296,11 @@ function Register() {
                   Email address
                 </label>
                 <input
+                  value={formData.email}
+                  onChange={handleChange}
                   id="email"
                   type="email"
+                  name="email"
                   placeholder="you@example.com"
                   className="w-full rounded-xl border border-[#E8F5E9] bg-white px-4 py-3 text-base text-[#263238] placeholder:text-[#263238]/45 focus:border-[#2E7D32] focus:outline-none focus:ring-2 focus:ring-[#2E7D32]/20"
                 />
@@ -147,8 +314,11 @@ function Register() {
                   Phone number
                 </label>
                 <input
-                  id="phone"
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                  id="phoneNumber"
                   type="tel"
+                  name="phoneNumber"
                   placeholder="+233 20 000 0000"
                   className="w-full rounded-xl border border-[#E8F5E9] bg-white px-4 py-3 text-base text-[#263238] placeholder:text-[#263238]/45 focus:border-[#2E7D32] focus:outline-none focus:ring-2 focus:ring-[#2E7D32]/20"
                 />
@@ -162,9 +332,10 @@ function Register() {
                   I am joining as
                 </label>
                 <select
+                  value={formData.role}
+                  name="role"
+                  onChange={handleChange}
                   id="role"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
                   className="w-full rounded-xl border border-[#E8F5E9] bg-white px-4 py-3 text-base text-[#263238] focus:border-[#2E7D32] focus:outline-none focus:ring-2 focus:ring-[#2E7D32]/20"
                 >
                   <option value="CUSTOMER">Customer</option>
@@ -180,11 +351,20 @@ function Register() {
                   Password
                 </label>
                 <input
+                  value={formData.password}
+                  name="password"
+                  onChange={handleChange}
                   id="password"
                   type="password"
                   placeholder="Create a strong password"
                   className="w-full rounded-xl border border-[#E8F5E9] bg-white px-4 py-3 text-base text-[#263238] placeholder:text-[#263238]/45 focus:border-[#2E7D32] focus:outline-none focus:ring-2 focus:ring-[#2E7D32]/20"
                 />
+                <p className="mt-2 text-xs text-[#4A5E4F]">
+                  Use at least 8 characters, 1 capital letter and 1 number.
+                </p>
+                {passwordError ? (
+                  <p className="mt-2 text-sm text-[#B42318]">{passwordError}</p>
+                ) : null}
               </div>
 
               <div>
@@ -195,6 +375,9 @@ function Register() {
                   Confirm password
                 </label>
                 <input
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  name="confirmPassword"
                   id="confirmPassword"
                   type="password"
                   placeholder="Repeat password"
@@ -222,9 +405,10 @@ function Register() {
 
               <button
                 type="submit"
-                className="w-full rounded-xl bg-[#1B5E20] px-5 py-3.5 text-base font-semibold text-white transition hover:bg-[#154a1a] focus:outline-none focus:ring-4 focus:ring-[#1B5E20]/20"
+                disabled={isSubmitting}
+                className="w-full rounded-xl bg-[#1B5E20] px-5 py-3.5 text-base font-semibold text-white transition hover:bg-[#154a1a] focus:outline-none focus:ring-4 focus:ring-[#1B5E20]/20 disabled:cursor-not-allowed disabled:opacity-70"
               >
-                Create account
+                {isSubmitting ? "Creating account..." : "Create account"}
               </button>
             </form>
 
