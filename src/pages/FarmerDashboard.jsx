@@ -12,24 +12,16 @@ const navItems = [
   "Logout",
 ];
 
-const productRows = [
-  { name: "Tomatoes", price: "₦2,000", stock: 20, category: "Vegetables" },
-  { name: "Pepper", price: "₦1,500", stock: 15, category: "Vegetables" },
-  { name: "Carrots", price: "₦3,000", stock: 10, category: "Vegetables" },
-];
+const productRows = [];
 
 const overviewCards = [
-  { label: "Products", value: "25" },
-  { label: "Orders", value: "18" },
-  { label: "Pending", value: "4" },
-  { label: "Revenue", value: "₦150,000" },
+  { label: "Products", value: "0" },
+  { label: "Orders", value: "0" },
+  { label: "Pending", value: "0" },
+  { label: "Revenue", value: "₦0" },
 ];
 
-const recentOrders = [
-  { id: "#1024", status: "Pending" },
-  { id: "#1023", status: "Accepted" },
-  { id: "#1022", status: "Ready" },
-];
+const recentOrders = [];
 
 const orderStatuses = [
   "Pending",
@@ -40,17 +32,13 @@ const orderStatuses = [
 ];
 
 const currentOrder = {
-  id: "#1025",
-  customer: "John",
-  items: ["Tomatoes × 2", "Pepper × 1"],
-  pickup: "Saturday, 10:00 AM",
+  id: "#0000",
+  customer: "No customer yet",
+  items: [],
+  pickup: "No pickup scheduled",
 };
 
-const stockItems = [
-  { name: "Tomatoes", qty: "20 kg" },
-  { name: "Pepper", qty: "15 kg" },
-  { name: "Carrots", qty: "10 kg" },
-];
+const stockItems = [];
 
 const reviews = [
   {
@@ -71,10 +59,10 @@ const reviews = [
 ];
 
 const insightStats = {
-  totalOrders: 120,
-  completedOrders: 105,
-  revenue: "₦850,000",
-  topProducts: ["Tomatoes", "Pepper", "Carrots"],
+  totalOrders: 0,
+  completedOrders: 0,
+  revenue: "₦0",
+  topProducts: [],
 };
 
 const productFormFields = [
@@ -175,21 +163,25 @@ function FarmerDashboard() {
 
       <div className="rounded-[22px] border border-[#E7F1E8] bg-white p-5 shadow-[0_12px_28px_rgba(27,94,32,0.06)]">
         <h3 className="mb-3 text-xl font-bold text-[#173E1A]">Recent Orders</h3>
-        <div className="space-y-3">
-          {recentOrders.map((order) => (
-            <div
-              key={order.id}
-              className="flex items-center justify-between rounded-xl bg-[#F7F9F3] px-4 py-3"
-            >
-              <span className="font-medium text-[#173E1A]">
-                Order {order.id}
-              </span>
-              <span className="rounded-full bg-[#E8F5E9] px-2.5 py-1 text-xs font-semibold text-[#1B5E20]">
-                {order.status}
-              </span>
-            </div>
-          ))}
-        </div>
+        {recentOrders.length === 0 ? (
+          <p className="text-sm text-[#4A5E4F]">No recent orders yet.</p>
+        ) : (
+          <div className="space-y-3">
+            {recentOrders.map((order) => (
+              <div
+                key={order.id}
+                className="flex items-center justify-between rounded-xl bg-[#F7F9F3] px-4 py-3"
+              >
+                <span className="font-medium text-[#173E1A]">
+                  Order {order.id}
+                </span>
+                <span className="rounded-full bg-[#E8F5E9] px-2.5 py-1 text-xs font-semibold text-[#1B5E20]">
+                  {order.status}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="rounded-[22px] border border-[#E7F1E8] bg-white p-5 shadow-[0_12px_28px_rgba(27,94,32,0.06)]">
@@ -262,47 +254,57 @@ function FarmerDashboard() {
         </div>
       ) : null}
 
-      <div className="overflow-hidden rounded-[22px] border border-[#E7F1E8] bg-white shadow-[0_12px_28px_rgba(27,94,32,0.06)]">
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-left">
-            <thead className="bg-[#EAF3EB] text-sm uppercase tracking-[0.08em] text-[#1B5E20]">
-              <tr>
-                <th className="px-5 py-3">Product</th>
-                <th className="px-5 py-3">Price</th>
-                <th className="px-5 py-3">Stock</th>
-                <th className="px-5 py-3">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {productRows.map((product) => (
-                <tr key={product.name} className="border-t border-[#EDF4EE]">
-                  <td className="px-5 py-3 font-semibold text-[#173E1A]">
-                    {product.name}
-                  </td>
-                  <td className="px-5 py-3 text-[#3E5243]">{product.price}</td>
-                  <td className="px-5 py-3 text-[#3E5243]">{product.stock}</td>
-                  <td className="px-5 py-3">
-                    <div className="flex flex-wrap gap-2">
-                      <button className="rounded-lg border border-[#1B5E20] px-2.5 py-1.5 text-xs font-semibold text-[#1B5E20]">
-                        View
-                      </button>
-                      <button className="rounded-lg border border-[#1B5E20] px-2.5 py-1.5 text-xs font-semibold text-[#1B5E20]">
-                        Edit
-                      </button>
-                      <button className="rounded-lg border border-[#D34B4B] px-2.5 py-1.5 text-xs font-semibold text-[#D34B4B]">
-                        Delete
-                      </button>
-                      <button className="rounded-lg bg-[#F9C74F] px-2.5 py-1.5 text-xs font-semibold text-[#173E1A]">
-                        Mark Sold Out
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {productRows.length === 0 ? (
+        <div className="rounded-[22px] border border-[#E7F1E8] bg-white p-5 shadow-[0_12px_28px_rgba(27,94,32,0.06)]">
+          <p className="text-sm text-[#4A5E4F]">No products added yet.</p>
         </div>
-      </div>
+      ) : (
+        <div className="overflow-hidden rounded-[22px] border border-[#E7F1E8] bg-white shadow-[0_12px_28px_rgba(27,94,32,0.06)]">
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-left">
+              <thead className="bg-[#EAF3EB] text-sm uppercase tracking-[0.08em] text-[#1B5E20]">
+                <tr>
+                  <th className="px-5 py-3">Product</th>
+                  <th className="px-5 py-3">Price</th>
+                  <th className="px-5 py-3">Stock</th>
+                  <th className="px-5 py-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {productRows.map((product) => (
+                  <tr key={product.name} className="border-t border-[#EDF4EE]">
+                    <td className="px-5 py-3 font-semibold text-[#173E1A]">
+                      {product.name}
+                    </td>
+                    <td className="px-5 py-3 text-[#3E5243]">
+                      {product.price}
+                    </td>
+                    <td className="px-5 py-3 text-[#3E5243]">
+                      {product.stock}
+                    </td>
+                    <td className="px-5 py-3">
+                      <div className="flex flex-wrap gap-2">
+                        <button className="rounded-lg border border-[#1B5E20] px-2.5 py-1.5 text-xs font-semibold text-[#1B5E20]">
+                          View
+                        </button>
+                        <button className="rounded-lg border border-[#1B5E20] px-2.5 py-1.5 text-xs font-semibold text-[#1B5E20]">
+                          Edit
+                        </button>
+                        <button className="rounded-lg border border-[#D34B4B] px-2.5 py-1.5 text-xs font-semibold text-[#D34B4B]">
+                          Delete
+                        </button>
+                        <button className="rounded-lg bg-[#F9C74F] px-2.5 py-1.5 text-xs font-semibold text-[#173E1A]">
+                          Mark Sold Out
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 
@@ -333,7 +335,7 @@ function FarmerDashboard() {
             Order {currentOrder.id}
           </h3>
           <span className="rounded-full bg-[#FFF3CD] px-2.5 py-1 text-xs font-semibold text-[#8A6D1F]">
-            Pending
+            No orders yet
           </span>
         </div>
 
@@ -345,11 +347,15 @@ function FarmerDashboard() {
           <p>
             <span className="font-semibold text-[#173E1A]">Products:</span>
           </p>
-          <ul className="list-disc space-y-1 pl-6">
-            {currentOrder.items.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
+          {currentOrder.items.length === 0 ? (
+            <p className="text-sm text-[#4A5E4F]">No order items yet.</p>
+          ) : (
+            <ul className="list-disc space-y-1 pl-6">
+              {currentOrder.items.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          )}
           <p>
             <span className="font-semibold text-[#173E1A]">Pickup:</span>{" "}
             {currentOrder.pickup}
@@ -359,11 +365,15 @@ function FarmerDashboard() {
         <div className="mt-5 flex flex-wrap gap-3">
           <button
             onClick={() => setAccepted(true)}
-            className="rounded-xl bg-[#1B5E20] px-4 py-2.5 text-sm font-semibold text-white"
+            className="rounded-xl bg-[#1B5E20] px-4 py-2.5 text-sm font-semibold text-white opacity-60"
+            disabled
           >
             Accept
           </button>
-          <button className="rounded-xl border border-[#1B5E20] bg-white px-4 py-2.5 text-sm font-semibold text-[#1B5E20]">
+          <button
+            className="rounded-xl border border-[#1B5E20] bg-white px-4 py-2.5 text-sm font-semibold text-[#1B5E20] opacity-60"
+            disabled
+          >
             Decline
           </button>
           {accepted ? (
@@ -386,22 +396,26 @@ function FarmerDashboard() {
       </div>
 
       <div className="rounded-[22px] border border-[#E7F1E8] bg-white p-5 shadow-[0_12px_28px_rgba(27,94,32,0.06)]">
-        <div className="space-y-3">
-          {stockItems.map((item) => (
-            <div
-              key={item.name}
-              className="flex items-center justify-between rounded-xl bg-[#F7F9F3] px-4 py-3"
-            >
-              <span className="font-medium text-[#173E1A]">{item.name}</span>
-              <div className="flex items-center gap-3">
-                <span className="text-[#3E5243]">{item.qty}</span>
-                <button className="rounded-lg border border-[#1B5E20] px-2.5 py-1.5 text-xs font-semibold text-[#1B5E20]">
-                  Sold Out
-                </button>
+        {stockItems.length === 0 ? (
+          <p className="text-sm text-[#4A5E4F]">No stock yet.</p>
+        ) : (
+          <div className="space-y-3">
+            {stockItems.map((item) => (
+              <div
+                key={item.name}
+                className="flex items-center justify-between rounded-xl bg-[#F7F9F3] px-4 py-3"
+              >
+                <span className="font-medium text-[#173E1A]">{item.name}</span>
+                <div className="flex items-center gap-3">
+                  <span className="text-[#3E5243]">{item.qty}</span>
+                  <button className="rounded-lg border border-[#1B5E20] px-2.5 py-1.5 text-xs font-semibold text-[#1B5E20]">
+                    Sold Out
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -463,13 +477,17 @@ function FarmerDashboard() {
         <h3 className="text-xl font-bold text-[#173E1A]">
           Best Selling Products
         </h3>
-        <ol className="mt-4 space-y-3 pl-6 text-[#2F443B]">
-          {insightStats.topProducts.map((product, index) => (
-            <li key={product} className="list-decimal text-base">
-              {index + 1}. {product}
-            </li>
-          ))}
-        </ol>
+        {insightStats.topProducts.length === 0 ? (
+          <p className="mt-4 text-sm text-[#4A5E4F]">No sales data yet.</p>
+        ) : (
+          <ol className="mt-4 space-y-3 pl-6 text-[#2F443B]">
+            {insightStats.topProducts.map((product, index) => (
+              <li key={product} className="list-decimal text-base">
+                {index + 1}. {product}
+              </li>
+            ))}
+          </ol>
+        )}
       </div>
     </div>
   );
