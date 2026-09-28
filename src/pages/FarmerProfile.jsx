@@ -1,4 +1,5 @@
 import React from "react";
+import { MapPin } from "lucide-react";
 
 const getStoredUser = () => {
   try {
@@ -100,7 +101,6 @@ function FarmerProfile() {
           </div>
         </header>
 
-
         <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
           <section className="overflow-hidden rounded-[28px] border border-[#E8F5E9] bg-white shadow-[0_20px_60px_rgba(27,94,32,0.08)]">
             <div className="bg-gradient-to-r from-[#A5D6A7] via-[#DFF3DF] to-[#FFFDF5] p-6 sm:p-8">
@@ -158,7 +158,7 @@ function FarmerProfile() {
 
               <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#1B5E20] text-xl text-white shadow-lg ring-4 ring-white/80">
-                  📍
+                  <MapPin size={21} aria-hidden="true" />
                 </div>
                 <div className="mt-2 rounded-full bg-[#1B5E20] px-3 py-1 text-xs font-semibold text-white">
                   Stall A-07

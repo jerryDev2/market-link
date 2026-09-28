@@ -1,168 +1,166 @@
-import {Link} from "react-router-dom";
-import {motion} from "motion/react";
+import { Link } from "react-router-dom";
+import { motion } from "motion/react";
+import { Check } from "lucide-react";
 
 function AboutUsSection() {
-    return (<section className="relative overflow-hidden bg-[#FFFDF5] py-20 sm:py-24">
-        <div className="relative mx-auto max-w-[1200px] px-5 sm:px-8 lg:px-10">
-            <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-                {/* Image Side */}
-                <div className="relative">
-                    <div className="relative overflow-hidden rounded-[24px]">
-                        <img
-                            src="/images/about-us2.jpg"
-                            alt="Local farmer with fresh farm produce"
-                            className="h-[380px] w-full object-cover sm:h-[450px]"
-                        />
+  return (
+    <section className="relative overflow-hidden bg-[#FFFDF5] py-20 sm:py-24">
+      <div className="relative mx-auto max-w-[1200px] px-5 sm:px-8 lg:px-10">
+        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+          {/* Image Side */}
+          <div className="relative">
+            <div className="relative overflow-hidden rounded-[24px]">
+              <img
+                src="/images/about-us2.jpg"
+                alt="Local farmer with fresh farm produce"
+                className="h-[380px] w-full object-cover sm:h-[450px]"
+              />
 
-                        {/* Image overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#1B5E20]/50 via-transparent to-transparent"/>
-                    </div>
+              {/* Image overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#1B5E20]/50 via-transparent to-transparent" />
+            </div>
 
-                    {/* Floating card */}
-                    <div className="absolute right-4 -bottom-6 rounded-2xl bg-white px-5 py-4 shadow-[0_10px_30px_rgba(27,94,32,0.15)] sm:right-8">
-                        <div className="flex items-center gap-3">
-                            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#E8F5E9]">
-                                <svg
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    className="h-6 w-6 text-[#1B5E20]"
-                                >
-                                    <path
-                                        d="M12 21s8-4.5 8-11a8 8 0 0 0-16 0c0 6.5 8 11 8 11Z"
-                                        stroke="currentColor"
-                                        strokeWidth="1.8"
-                                    />
-                                    <path
-                                        d="M9 10.5c1.5-2 4.5-2 6 0M9.5 14c1.5 1 3.5 1 5 0"
-                                        stroke="currentColor"
-                                        strokeWidth="1.8"
-                                        strokeLinecap="round"
-                                    />
-                                </svg>
-                            </div>
-
-                            <div>
-                                <p className="font-['Poppins'] text-sm font-bold text-[#1B5E20]">
-                                    Local & Fresh
-                                </p>
-                                <p className="font-['Inter'] text-xs text-[#607D8B]">
-                                    Supporting local farmers
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Small accent */}
-                    <div className="absolute -top-3 -left-3 h-16 w-16 rounded-2xl border-4 border-[#F9C74F] sm:-top-5 sm:-left-5"/>
+            {/* Floating card */}
+            <div className="absolute right-4 -bottom-6 rounded-2xl bg-white px-5 py-4 shadow-[0_10px_30px_rgba(27,94,32,0.15)] sm:right-8">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#E8F5E9]">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    className="h-6 w-6 text-[#1B5E20]"
+                  >
+                    <path
+                      d="M12 21s8-4.5 8-11a8 8 0 0 0-16 0c0 6.5 8 11 8 11Z"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                    />
+                    <path
+                      d="M9 10.5c1.5-2 4.5-2 6 0M9.5 14c1.5 1 3.5 1 5 0"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                    />
+                  </svg>
                 </div>
 
-                {/* Content Side */}
-                <div className="lg:pl-4">
-                    <div className="mb-4 flex items-center gap-3">
-                        <span className="h-[2px] w-8 bg-[#F9C74F]"/>
+                <div>
+                  <p className="font-['Poppins'] text-sm font-bold text-[#1B5E20]">
+                    Local & Fresh
+                  </p>
+                  <p className="font-['Inter'] text-xs text-[#607D8B]">
+                    Supporting local farmers
+                  </p>
+                </div>
+              </div>
+            </div>
 
-                        <span className="font-['Poppins'] text-xs font-semibold uppercase tracking-[0.18em] text-[#1B5E20]">
+            {/* Small accent */}
+            <div className="absolute -top-3 -left-3 h-16 w-16 rounded-2xl border-4 border-[#F9C74F] sm:-top-5 sm:-left-5" />
+          </div>
+
+          {/* Content Side */}
+          <div className="lg:pl-4">
+            <div className="mb-4 flex items-center gap-3">
+              <span className="h-[2px] w-8 bg-[#F9C74F]" />
+
+              <span className="font-['Poppins'] text-xs font-semibold uppercase tracking-[0.18em] text-[#1B5E20]">
                 About MarketLink
               </span>
-                    </div>
+            </div>
 
-                    <motion.h2
-                        initial={{opacity: 0.1, y: 100}}
-                        whileInView={{opacity: 1, y: -0}}
-                        transition={{duration: 0.9}}
-                        viewport={{once: true,}}
+            <motion.h2
+              initial={{ opacity: 0.1, y: 100 }}
+              whileInView={{ opacity: 1, y: -0 }}
+              transition={{ duration: 0.9 }}
+              viewport={{ once: true }}
+              className="max-w-xl font-['Poppins'] text-3xl font-bold leading-tight text-[#1B5E20] sm:text-4xl"
+            >
+              Connecting local farmers with the people they feed.
+            </motion.h2>
 
+            <motion.p
+              initial={{ opacity: 0.1, y: 100 }}
+              whileInView={{ opacity: 1, y: -0 }}
+              transition={{ duration: 0.9 }}
+              viewport={{ once: true }}
+              className="mt-5 font-['Inter'] text-base leading-7 text-[#455A64]"
+            >
+              MarketLink makes it easier for people to discover fresh farm
+              products while giving local farmers a better way to reach
+              customers in their communities.
+            </motion.p>
 
-                        className="max-w-xl font-['Poppins'] text-3xl font-bold leading-tight text-[#1B5E20] sm:text-4xl">
-                        Connecting local farmers with the people they feed.
-                    </motion.h2>
+            <motion.p
+              initial={{ opacity: 0.1, y: 100 }}
+              whileInView={{ opacity: 1, y: -0 }}
+              transition={{ duration: 0.9 }}
+              viewport={{ once: true }}
+              className="mt-4 font-['Inter'] text-base leading-7 text-[#455A64]"
+            >
+              From finding a nearby market to browsing products and pre-ordering
+              your produce, we are creating a simpler connection between the
+              farm and your table.
+            </motion.p>
 
-                    <motion.p
-                        initial={{opacity: 0.1, y: 100}}
-                        whileInView={{opacity: 1, y: -0}}
-                        transition={{duration: 0.9}}
-                        viewport={{once: true,}}
+            {/* Brand values */}
+            <motion.div
+              initial={{ opacity: 0.1, y: 100 }}
+              whileInView={{ opacity: 1, y: -0 }}
+              transition={{ duration: 0.9 }}
+              viewport={{ once: true }}
+              className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-3"
+            >
+              <div>
+                <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-[#F9C74F] text-[#1B5E20]">
+                  <Check size={19} aria-hidden="true" />
+                </div>
+                <p className="font-['Poppins'] text-sm font-semibold text-[#1B5E20]">
+                  Fresh Produce
+                </p>
+              </div>
 
+              <div>
+                <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-[#F9C74F] text-[#1B5E20]">
+                  <Check size={19} aria-hidden="true" />
+                </div>
+                <p className="font-['Poppins'] text-sm font-semibold text-[#1B5E20]">
+                  Local Farmers
+                </p>
+              </div>
 
-                        className="mt-5 font-['Inter'] text-base leading-7 text-[#455A64]">
-                        MarketLink makes it easier for people to discover fresh farm
-                        products while giving local farmers a better way to reach
-                        customers in their communities.
-                    </motion.p>
+              <div>
+                <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-[#F9C74F] text-[#1B5E20]">
+                  <Check size={19} aria-hidden="true" />
+                </div>
+                <p className="font-['Poppins'] text-sm font-semibold text-[#1B5E20]">
+                  Better Communities
+                </p>
+              </div>
+            </motion.div>
 
-                    <motion.p
-                        initial={{opacity: 0.1, y: 100}}
-                        whileInView={{opacity: 1, y: -0}}
-                        transition={{duration: 0.9}}
-                        viewport={{once: true,}}
-
-
-                        className="mt-4 font-['Inter'] text-base leading-7 text-[#455A64]">
-                        From finding a nearby market to browsing products and pre-ordering
-                        your produce, we are creating a simpler connection between the
-                        farm and your table.
-                    </motion.p>
-
-                    {/* Brand values */}
-                    <motion.div
-                        initial={{opacity: 0.1, y: 100}}
-                        whileInView={{opacity: 1, y: -0}}
-                        transition={{duration: 0.9}}
-                        viewport={{once: true,}}
-
-
-                        className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-3">
-                        <div>
-                            <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-[#F9C74F] text-[#1B5E20]">
-                                ✓
-                            </div>
-                            <p className="font-['Poppins'] text-sm font-semibold text-[#1B5E20]">
-                                Fresh Produce
-                            </p>
-                        </div>
-
-                        <div>
-                            <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-[#F9C74F] text-[#1B5E20]">
-                                ✓
-                            </div>
-                            <p className="font-['Poppins'] text-sm font-semibold text-[#1B5E20]">
-                                Local Farmers
-                            </p>
-                        </div>
-
-                        <div>
-                            <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-lg bg-[#F9C74F] text-[#1B5E20]">
-                                ✓
-                            </div>
-                            <p className="font-['Poppins'] text-sm font-semibold text-[#1B5E20]">
-                                Better Communities
-                            </p>
-                        </div>
-                    </motion.div>
-
-                    {/* CTA */}
-                    <motion.div
-
-                        initial={{opacity: 0.1, y: 100}}
-                        whileInView={{opacity: 1, y: -0}}
-                        transition={{duration: 0.9}}
-                        viewport={{once: true}}
-
-                        className="mt-8">
-                        <Link
-                            to="/about-us"
-                            className="group inline-flex items-center gap-2 rounded-xl bg-[#1B5E20] px-6 py-3.5 font-['Poppins'] text-sm font-semibold text-white shadow-[0_5px_15px_rgba(27,94,32,0.15)] transition-all duration-300 "
-                        >
-                            Learn More About Us
-                            <span className="rightArrow transition-transform duration-300">
+            {/* CTA */}
+            <motion.div
+              initial={{ opacity: 0.1, y: 100 }}
+              whileInView={{ opacity: 1, y: -0 }}
+              transition={{ duration: 0.9 }}
+              viewport={{ once: true }}
+              className="mt-8"
+            >
+              <Link
+                to="/about-us"
+                className="group inline-flex items-center gap-2 rounded-xl bg-[#1B5E20] px-6 py-3.5 font-['Poppins'] text-sm font-semibold text-white shadow-[0_5px_15px_rgba(27,94,32,0.15)] transition-all duration-300 "
+              >
+                Learn More About Us
+                <span className="rightArrow transition-transform duration-300">
                   →
                 </span>
-                        </Link>
-                    </motion.div>
-                </div>
-            </div>
+              </Link>
+            </motion.div>
+          </div>
         </div>
-    </section>);
+      </div>
+    </section>
+  );
 }
 
 export default AboutUsSection;
