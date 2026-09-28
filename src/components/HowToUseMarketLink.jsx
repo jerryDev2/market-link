@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function HowToUseMarketLink() {
   const steps = [
     {
@@ -194,7 +196,7 @@ function HowToUseMarketLink() {
         </div>
 
         {/* ================= BOTTOM CTA ================= */}
-        <div className="mx-auto mt-14 flex max-w-3xl flex-col items-center justify-between gap-5 rounded-2xl bg-[#1B5E20] px-7 py-6 text-center sm:flex-row sm:text-left">
+        <div className="mx-auto mt-14 flex max-w-6xl flex-col items-center justify-between gap-5 rounded-2xl bg-[#1B5E20] px-14 py-12 text-center sm:flex-row sm:text-left">
           <div>
             <h3 className="font-['Poppins'] text-lg font-semibold text-white">
               Ready to shop fresh?
@@ -205,15 +207,15 @@ function HowToUseMarketLink() {
             </p>
           </div>
 
-          <a
-            href="/shop"
+          <Link
+            to="/market"
             className="group flex shrink-0 items-center gap-2 rounded-lg bg-[#F9C74F] px-5 py-3 font-['Poppins'] text-sm font-semibold text-[#263238] transition duration-300 hover:-translate-y-0.5 hover:bg-[#FFD66B]"
           >
             Explore Markets
             <span className="transition-transform duration-300 group-hover:translate-x-1">
               →
             </span>
-          </a>
+          </Link>
         </div>
       </div>
     </section>
