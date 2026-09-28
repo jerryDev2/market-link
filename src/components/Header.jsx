@@ -1,9 +1,10 @@
 import { Link, NavLink } from "react-router-dom";
 import logo from "../assets/images/marketlinklogo.png"
+import {motion} from "motion/react";
 function Header() {
   return (
-    <header className="relative z-50 bg-[#1B5E20]">
-      <nav className="mx-auto flex h-[76px] max-w-6xl items-center justify-between px-5 sm:px-8 lg:px-10">
+    <motion.header className="relative z-50 bg-[#1B5E20]">
+      <motion.nav className="mx-auto flex h-[76px] max-w-6xl items-center justify-between px-5 sm:px-8 lg:px-10">
         {/* Logo */}
         <a href="/" className="flex items-center gap-2.5">
           
@@ -130,7 +131,10 @@ function Header() {
                     </svg>
                 </button>
             </motion.nav>
-        </motion.header>);
+        </motion.header>
+
+
+  );
 }
 
 export default Header;

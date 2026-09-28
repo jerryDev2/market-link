@@ -105,11 +105,11 @@ function HeroSection() {
                 {/* ================= RIGHT IMAGE ================= */}
                 <div className="relative min-h-120 lg:min-h-full">
                     <div className="absolute inset-0">
-                        {/*<img*/}
-                        {/*    src={background}*/}
-                        {/*    alt="Local farmer holding freshly harvested produce"*/}
-                        {/*    className="h-full w-full object-cover"*/}
-                        {/*/>*/}
+                        <img
+                            src={background}
+                            alt="Local farmer holding freshly harvested produce"
+                            className="h-full w-full object-cover"
+                        />
 
                         {/* Soft blend into content */}
                         <div className="absolute inset-0 bg-linear-to-r from-[#FFFDF5] to-transparent lg:w-1/3"/>
