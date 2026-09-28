@@ -1,29 +1,82 @@
 import React from "react";
 
-const profileDetails = [
-  { label: "Stall / Business name", value: "Green Valley Harvest" },
-  {
-    label: "Contact information",
-    value: "+233 20 123 4567 · hello@greenvalleyharvest.com",
-  },
-  { label: "Address", value: "No. 12 Farm Lane, Ashaiman, Greater Accra" },
-  { label: "Market location", value: "Agbogba Farmers Market · Stall A-07" },
-  { label: "Operating days", value: "Monday - Saturday" },
-  {
-    label: "Pickup time windows",
-    value: "7:00 AM - 11:00 AM · 3:00 PM - 6:00 PM",
-  },
-];
+const getStoredUser = () => {
+  try {
+    const rawUser = localStorage.getItem("user");
+    return rawUser ? JSON.parse(rawUser) : null;
+  } catch (error) {
+    return null;
+  }
+};
 
-const operatingDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const getDisplayName = (user) => {
+  if (!user) return "Farmer";
 
-const pickupWindows = [
-  "7:00 AM - 9:00 AM",
-  "10:00 AM - 12:00 PM",
-  "3:00 PM - 5:00 PM",
-];
+  const firstName = user.firstName || user.firstname || "";
+  const lastName = user.lastName || user.lastname || "";
+  const fullName = user.name || user.fullName || user.fullname || "";
+
+  if (firstName || lastName) {
+    return `${firstName} ${lastName}`.trim() || "Farmer";
+  }
+
+  if (fullName) {
+    return fullName;
+  }
+
+  if (user.email) {
+    return user.email.split("@")[0];
+  }
+
+  return "Farmer";
+};
 
 function FarmerProfile() {
+  const user = getStoredUser();
+  const displayName = getDisplayName(user);
+  const profileDetails = [
+    {
+      label: "Stall / Business name",
+      value:
+        user?.farmName ||
+        user?.businessName ||
+        user?.stallName ||
+        "MarketLink Farm",
+    },
+    {
+      label: "Contact information",
+      value: `${user?.phoneNumber || user?.phone || "+233 000 000 000"} · ${user?.email || "farmer@marketlink.com"}`,
+    },
+    {
+      label: "Address",
+      value:
+        user?.address ||
+        user?.farmAddress ||
+        "No. 12 Farm Lane, Ashaiman, Greater Accra",
+    },
+    {
+      label: "Market location",
+      value: user?.marketLocation || "Agbogba Farmers Market · Stall A-07",
+    },
+    {
+      label: "Operating days",
+      value: user?.operatingDays || "Monday - Saturday",
+    },
+    {
+      label: "Pickup time windows",
+      value:
+        user?.pickupTimeWindows || "7:00 AM - 11:00 AM · 3:00 PM - 6:00 PM",
+    },
+  ];
+
+  const operatingDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+  const pickupWindows = [
+    "7:00 AM - 9:00 AM",
+    "10:00 AM - 12:00 PM",
+    "3:00 PM - 5:00 PM",
+  ];
+
   return (
     <div className="min-h-screen bg-[#FFFDF5] px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
       <div className="mx-auto max-w-7xl">
@@ -54,7 +107,7 @@ function FarmerProfile() {
               <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-4">
                   <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#1B5E20] text-2xl font-bold text-white shadow-sm">
-                    G
+                    {displayName.charAt(0).toUpperCase()}
                   </div>
 
                   <div>
@@ -62,7 +115,7 @@ function FarmerProfile() {
                       Farm stall
                     </p>
                     <h2 className="text-2xl font-bold text-[#1B5E20] sm:text-3xl">
-                      Green Valley Harvest
+                      {displayName}
                     </h2>
                   </div>
                 </div>

@@ -1,21 +1,16 @@
-import {Link, NavLink} from "react-router-dom";
-import logo from "../assets/images/marketlinklogo.png";
-import {motion} from "motion/react";
-
+import { Link, NavLink } from "react-router-dom";
+import logo from "../assets/images/marketlinklogo.png"
 function Header() {
-    return (<motion.header
-            // initial={{y:-100, opacity:0}}
-            // animate={{y:0, opacity:1}}
-            // transition={{duration:0.2}}
-            // viewport={{once: true, amount: 0.2}}
-            className="sticky top-0 z-50 bg-[#1B5E20]">
-            <motion.nav
+  return (
+    <header className="relative z-50 bg-[#1B5E20]">
+      <nav className="mx-auto flex h-[76px] max-w-6xl items-center justify-between px-5 sm:px-8 lg:px-10">
+        {/* Logo */}
+        <a href="/" className="flex items-center gap-2.5">
+          
+          <img src={logo} alt="" className="w-40"/>
+          
 
-                className="mx-auto  flex h-19 max-w-6xl items-center justify-between px-5 sm:px-8 lg:px-10">
-                {/* Logo */}
-                <a href="/" className="flex items-center gap-2.5">
-                    <img src={logo} alt="" className="w-40"/>
-                </a>
+        </a>
 
                 {/* Navigation */}
                 <div className="hidden items-center gap-5 lg:flex">
@@ -87,38 +82,38 @@ function Header() {
                         </svg>
                     </div>
 
-                    {/* Cart */}
-                    <button
-                        aria-label="Shopping cart"
-                        className="relative cursor-pointer text-white transition hover:text-[#F9C74F] "
-                    >
-                        <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
-                            <path
-                                d="M4 5H6L8.2 15.2C8.4 16.2 9.3 17 10.4 17H17.5C18.5 17 19.3 16.4 19.7 15.5L21 9H7"
-                                stroke="currentColor"
-                                strokeWidth="1.8"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            />
+          {/* Cart */}
+          <button
+            aria-label="Shopping cart"
+            className="relative cursor-pointer text-white transition hover:text-[#F9C74F] "
+          >
+            <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
+              <path
+                d="M4 5H6L8.2 15.2C8.4 16.2 9.3 17 10.4 17H17.5C18.5 17 19.3 16.4 19.7 15.5L21 9H7"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
 
                             <circle cx="10" cy="20" r="1.2" fill="currentColor"/>
                             <circle cx="18" cy="20" r="1.2" fill="currentColor"/>
                         </svg>
 
-                        <span className="absolute -right-2.5 -top-2 flex h-4.25 min-w-4.25 items-center justify-center rounded-full bg-[#F9C74F] px-1 font-['Inter'] text-[9px] font-bold text-[#263238]">
+            <span className="absolute -right-2.5 -top-2 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-[#F9C74F] px-1 font-['Inter'] text-[9px] font-bold text-[#263238]">
               0
             </span>
                     </button>
 
-                    <Link to="/login">
-                        <button
-                            aria-label="Account"
-                            className="cursor-pointer rounded-2xl bg-[#F9C74F] px-6 py-2.5 text-sm font-semibold text-[#000000] transition hover:bg-[#ffbc20]"
-                        >
-                            Sign in
-                        </button>
-                    </Link>
-                </div>
+          <Link to="/login">
+            <button
+              aria-label="Account"
+              className="cursor-pointer rounded-2xl bg-[#F9C74F] px-6 py-2.5 text-sm font-semibold text-[#000000] transition hover:bg-[#ffbc20]"
+            >
+              Sign in
+            </button>
+          </Link>
+        </div>
 
                 {/* Mobile menu */}
                 <button
