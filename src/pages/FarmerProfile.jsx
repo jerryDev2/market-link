@@ -47,6 +47,7 @@ function FarmerProfile() {
           </div>
         </header>
 
+
         <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
           <section className="overflow-hidden rounded-[28px] border border-[#E8F5E9] bg-white shadow-[0_20px_60px_rgba(27,94,32,0.08)]">
             <div className="bg-gradient-to-r from-[#A5D6A7] via-[#DFF3DF] to-[#FFFDF5] p-6 sm:p-8">

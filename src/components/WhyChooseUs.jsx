@@ -1,4 +1,5 @@
 import React from "react";
+import  {motion} from "motion/react";
 
 const features = [
   {
@@ -74,7 +75,9 @@ function WhyChooseUs() {
 
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           {features.map(({ icon, title, description }) => (
-            <article
+            <motion.article
+                initial={{opacity:0}}
+
               key={title}
               className="rounded-[28px] border border-[#E7F3E8] bg-white p-6 shadow-[0_18px_45px_rgba(27,94,32,0.06)] transition duration-300 hover:-translate-y-2 hover:shadow-[0_25px_60px_rgba(27,94,32,0.1)]"
             >
@@ -86,7 +89,7 @@ function WhyChooseUs() {
               <p className="mt-3 text-sm leading-6 text-[#4B5F52]">
                 {description}
               </p>
-            </article>
+            </motion.article>
           ))}
         </div>
       </div>

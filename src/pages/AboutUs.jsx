@@ -269,68 +269,9 @@ function AboutUs() {
       </div>
 
       {/* Impact Section */}
-      <div className="px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-        <div className="mx-auto max-w-6xl">
-          <div className="rounded-[26px] border border-[#E8F5E9] bg-white p-6 sm:p-8 lg:p-12 shadow-sm">
-            <h2 className="text-3xl font-bold text-[#1B5E20] sm:text-4xl">
-              Our Impact
-            </h2>
-            <div className="mt-8 grid gap-8 sm:grid-cols-3">
-              <div className="text-center">
-                <p className="text-4xl font-bold text-[#F9C74F]">🌍</p>
-                <p className="mt-4 text-lg font-semibold text-[#263238]">
-                  Reduce Waste
-                </p>
-                <p className="mt-2 text-[#263238]/80">
-                  Fewer wasted trips and better inventory planning for farmers
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-4xl font-bold text-[#F9C74F]">❤️</p>
-                <p className="mt-4 text-lg font-semibold text-[#263238]">
-                  Strengthen Community
-                </p>
-                <p className="mt-2 text-[#263238]/80">
-                  Build meaningful connections between farmers and customers
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-4xl font-bold text-[#F9C74F]">📈</p>
-                <p className="mt-4 text-lg font-semibold text-[#263238]">
-                  Fair Business
-                </p>
-                <p className="mt-2 text-[#263238]/80">
-                  Transparent pricing and direct relationships benefit everyone
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+
 
       {/* CTA Section */}
-      <div className="px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-        <div className="mx-auto max-w-4xl text-center">
-          <div className="rounded-[28px] border border-[#E8F5E9] bg-[#a5d6a73a] p-6 sm:p-8 lg:p-12 shadow-[0_25px_80px_rgba(27,94,32,0.08)]">
-            <h2 className="text-3xl font-bold text-[#1B5E20] sm:text-4xl">
-              Join the Local Movement
-            </h2>
-            <p className="mt-4 text-lg leading-8 text-[#263238]">
-              Whether you're a farmer looking to reach more customers or a
-              customer searching for fresh, local produce, MarketLink makes it
-              easy to connect with your community.
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center sm:gap-4">
-              <button className="rounded-xl bg-[#1B5E20] px-6 py-3 font-semibold text-white transition hover:bg-[#154a1a] focus:outline-none focus:ring-4 focus:ring-[#1B5E20]/20">
-                Start Shopping
-              </button>
-              <button className="rounded-xl border-2 border-[#1B5E20] bg-white px-6 py-3 font-semibold text-[#1B5E20] transition hover:bg-[#FFFDF5] focus:outline-none focus:ring-4 focus:ring-[#1B5E20]/20">
-                Become a Farmer Partner
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
