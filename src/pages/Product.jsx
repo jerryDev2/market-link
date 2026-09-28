@@ -1,12 +1,16 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, SlidersHorizontal } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext.jsx";
 import ProductItem from "../components/ProductItem.jsx";
 
 function Product() {
   const { products } = useContext(ShopContext);
 
-  const [category, setCategory] = useState("All-Products");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const category = searchParams.get("category") || "All-Products";
+  const searchTerm = searchParams.get("search") || "";
   const [showFilter, setShowFilter] = useState(false);
   const [sortType, setSortType] = useState("newest");
   const [showSortOptions, setShowSortOptions] = useState(false);
@@ -20,10 +24,14 @@ function Product() {
   ];
 
   const toggleCategory = (ev) => {
-    setCategory(ev.target.value);
+    const nextParams = new URLSearchParams(searchParams);
+    if (ev.target.value === "All-Products") {
+      nextParams.delete("category");
+    } else {
+      nextParams.set("category", ev.target.value);
+    }
+    setSearchParams(nextParams);
   };
-
- 
 
   useEffect(() => {
     const closeSortOptions = (event) => {
@@ -41,7 +49,31 @@ function Product() {
 
     // CATEGORY FILTER
     if (category !== "All-Products") {
-      productsCopy = productsCopy.filter((item) => item.category === category);
+      const normalize = (value) =>
+        String(value || "")
+          .toLowerCase()
+          .replace(/[^a-z]/g, "")
+          .replace(/^poutry$/, "poultry");
+      const categoryTerms = {
+        fruits: ["fruit", "horticulture"],
+        vegetables: ["vegetable", "horticulture"],
+        livestock: ["livestock", "dairy"],
+        grains: ["grain", "crop"],
+        poultry: ["poultry", "egg"],
+      };
+      const terms = categoryTerms[normalize(category)] || [normalize(category)];
+      productsCopy = productsCopy.filter((item) =>
+        terms.some((term) => normalize(item.category).includes(term)),
+      );
+    }
+
+    if (searchTerm.trim()) {
+      const query = searchTerm.trim().toLowerCase();
+      productsCopy = productsCopy.filter((item) =>
+        [item.name, item.category, item.description, item.farmer]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(query)),
+      );
     }
 
     // SORT
@@ -71,7 +103,7 @@ function Product() {
     }
 
     return productsCopy;
-  }, [products, category, sortType]);
+  }, [products, category, searchTerm, sortType]);
 
   const categories = [
     "All-Products",
@@ -80,8 +112,7 @@ function Product() {
     "Livestock",
     "Grains",
     "Tubers",
-    "Poutry",
-    ""
+    "Poultry",
   ];
 
   return (
@@ -97,6 +128,11 @@ function Product() {
           <p className="mt-4 text-base leading-7 text-(--color-text)/70">
             Browse fresh produce and essentials from the farmers who grow them.
           </p>
+          {searchTerm ? (
+            <p className="mt-3 text-sm font-medium text-(--color-success)">
+              Search results for “{searchTerm}”
+            </p>
+          ) : null}
         </div>
 
         <div className="mt-10 flex flex-col gap-5 border-y border-(--color-border) py-5 lg:flex-row lg:items-center lg:justify-between">
@@ -185,11 +221,39 @@ function Product() {
             {filterProducts.length} products available
           </p>
         </div>
-        <div className="grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
-          {filterProducts.map((item, index) => (
-            <ProductItem key={`${item.id}-${index}`} {...item} />
-          ))}
-        </div>
+        <AnimatePresence mode="popLayout">
+          {filterProducts.length ? (
+            <motion.div
+              layout
+              className="grid grid-cols-1 gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-4"
+            >
+              {filterProducts.map((item, index) => (
+                <motion.div
+                  key={`${item.id}-${index}`}
+                  layout
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{
+                    duration: 0.2,
+                    delay: Math.min(index * 0.035, 0.2),
+                  }}
+                >
+                  <ProductItem {...item} />
+                </motion.div>
+              ))}
+            </motion.div>
+          ) : (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="rounded-xl border border-(--color-border) bg-white px-5 py-10 text-center text-(--color-text)/70 sm:col-span-2 lg:col-span-4"
+            >
+              No products match this search or category.
+            </motion.p>
+          )}
+        </AnimatePresence>
       </div>
     </main>
   );

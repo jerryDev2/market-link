@@ -1,5 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import { Search, X } from "lucide-react";
+import { ShopContext } from "../context/ShopContext.jsx";
 import logo from "../assets/images/marketlinklogo.png";
 
 const getStoredUser = () => {
@@ -17,8 +20,100 @@ function Header() {
     Number(localStorage.getItem("cartCount") || 0),
   );
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const [searchFocused, setSearchFocused] = useState(false);
   const menuRef = useRef(null);
   const navigate = useNavigate();
+  const { products } = useContext(ShopContext);
+  const matchingProducts = searchValue.trim()
+    ? products
+        .filter((product) =>
+          [product.name, product.category, product.description]
+            .filter(Boolean)
+            .some((value) =>
+              String(value)
+                .toLowerCase()
+                .includes(searchValue.trim().toLowerCase()),
+            ),
+        )
+        .slice(0, 5)
+    : [];
+
+  const submitSearch = (event) => {
+    event.preventDefault();
+    const query = searchValue.trim();
+    if (!query) return;
+    setSearchFocused(false);
+    setMenuOpen(false);
+    navigate(`/product?search=${encodeURIComponent(query)}`);
+  };
+
+  const renderSearch = (mobile = false) => (
+    <form
+      onSubmit={submitSearch}
+      className={`relative flex h-10 items-center rounded-full bg-[#FFFDF5] px-4 ${mobile ? "w-full" : "w-[210px]"}`}
+      role="search"
+    >
+      <input
+        type="search"
+        value={searchValue}
+        onChange={(event) => setSearchValue(event.target.value)}
+        onFocus={() => setSearchFocused(true)}
+        placeholder="Search fresh products..."
+        aria-label="Search products"
+        aria-expanded={searchFocused && Boolean(searchValue.trim())}
+        className="min-w-0 flex-1 bg-transparent font-['Inter'] text-xs text-[#263238] outline-none placeholder:text-[#78909C]"
+      />
+      <button
+        type="submit"
+        aria-label="Submit product search"
+        className="grid h-8 w-8 shrink-0 place-items-center text-[#2E7D32]"
+      >
+        <Search size={17} />
+      </button>
+      <AnimatePresence>
+        {searchFocused && searchValue.trim() ? (
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 6 }}
+            className="absolute left-0 right-0 top-full z-[60] mt-2 overflow-hidden rounded-xl border border-[#E7F1E8] bg-white py-1 text-[#173E1A] shadow-[0_16px_36px_rgba(23,62,26,0.16)]"
+          >
+            {matchingProducts.length ? (
+              matchingProducts.map((product) => (
+                <Link
+                  key={product.id}
+                  to={`/productPage/${product.id}`}
+                  onClick={() => {
+                    setSearchFocused(false);
+                    setMenuOpen(false);
+                  }}
+                  className="block px-4 py-3 text-left transition hover:bg-[#F3F8F3]"
+                >
+                  <span className="block truncate text-sm font-semibold">
+                    {product.name}
+                  </span>
+                  <span className="mt-0.5 block text-xs text-[#607568]">
+                    {product.category}
+                  </span>
+                </Link>
+              ))
+            ) : (
+              <p className="px-4 py-3 text-sm text-[#607568]">
+                No matching products
+              </p>
+            )}
+            <button
+              type="submit"
+              className="w-full border-t border-[#E7F1E8] px-4 py-2.5 text-left text-xs font-semibold text-[#1B5E20] hover:bg-[#F3F8F3]"
+            >
+              See all results for “{searchValue.trim()}”
+            </button>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+    </form>
+  );
 
   useEffect(() => {
     const syncUser = () => setCurrentUser(getStoredUser());
@@ -76,7 +171,7 @@ function Header() {
         </a>
 
         {/* Navigation */}
-        <div className="hidden items-center gap-8 lg:flex">
+        <div className="hidden items-center gap-8 xl:flex">
           <NavLink
             to="/"
             className="font-['Poppins'] text-sm font-medium text-white/90 transition hover:text-[#F9C74F] border-b-2 hover:border-[#F9C74F] p-2 border-transparent "
@@ -114,36 +209,9 @@ function Header() {
         </div>
 
         {/* Right side */}
-        <div className="hidden items-center gap-7 lg:flex">
+        <div className="hidden items-center gap-7 xl:flex">
           {/* Search */}
-          <div className="flex h-10 w-[210px] items-center rounded-full bg-[#FFFDF5] px-4">
-            <input
-              type="text"
-              placeholder="Search fresh products..."
-              className="min-w-0 flex-1 bg-transparent font-['Inter'] text-xs text-[#263238] outline-none placeholder:text-[#78909C]"
-            />
-
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              className="h-4 w-4 text-[#2E7D32]"
-            >
-              <circle
-                cx="11"
-                cy="11"
-                r="6.5"
-                stroke="currentColor"
-                strokeWidth="2"
-              />
-
-              <path
-                d="M16 16L21 21"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
-          </div>
+          {renderSearch()}
 
           {/* Cart */}
           <button
@@ -242,19 +310,92 @@ function Header() {
 
         {/* Mobile menu */}
         <button
+          type="button"
           aria-label="Open menu"
-          className="rounded-lg p-2 text-white lg:hidden"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((open) => !open)}
+          className="rounded-lg p-2 text-white xl:hidden"
         >
-          <svg viewBox="0 0 24 24" fill="none" className="h-7 w-7">
-            <path
-              d="M4 7H20M4 12H20M4 17H20"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
+          {menuOpen ? (
+            <X size={26} />
+          ) : (
+            <svg viewBox="0 0 24 24" fill="none" className="h-7 w-7">
+              <path
+                d="M4 7H20M4 12H20M4 17H20"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
+          )}
         </button>
       </nav>
+      <AnimatePresence>
+        {menuOpen ? (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-visible border-t border-white/15 bg-[#1B5E20] px-5 pb-5 pt-4 xl:hidden"
+          >
+            <div className="mx-auto flex max-w-6xl flex-col gap-3">
+              {renderSearch(true)}
+              {[
+                ["Home", "/"],
+                ["Products", "/product"],
+                ["Market", "/market"],
+                ["About Us", "/about-us"],
+                ["Contact Us", "/contact-us"],
+              ].map(([label, to]) => (
+                <NavLink
+                  key={to}
+                  to={to}
+                  onClick={() => setMenuOpen(false)}
+                  className="py-2 text-sm font-medium text-white/90 hover:text-[#F9C74F]"
+                >
+                  {label}
+                </NavLink>
+              ))}
+              <div className="flex items-center gap-3 border-t border-white/15 pt-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    navigate(
+                      currentUser && localStorage.getItem("token")
+                        ? "/cart"
+                        : "/login",
+                    );
+                  }}
+                  className="rounded-lg border border-white/20 px-4 py-2 text-sm font-semibold text-white"
+                >
+                  Cart ({cartCount})
+                </button>
+                {currentUser ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      navigate("/customer-profile");
+                    }}
+                    className="rounded-lg bg-[#F9C74F] px-4 py-2 text-sm font-semibold text-[#173E1A]"
+                  >
+                    Profile
+                  </button>
+                ) : (
+                  <Link
+                    to="/login"
+                    onClick={() => setMenuOpen(false)}
+                    className="rounded-lg bg-[#F9C74F] px-4 py-2 text-sm font-semibold text-[#173E1A]"
+                  >
+                    Sign in
+                  </Link>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </header>
   );
 }

@@ -18,4 +18,16 @@ body {
   background: var(--color-cream);
   color: var(--color-text);
   font-family: "Inter", sans-serif;
+  min-width: 320px;
+  overflow-x: clip;
+}
+
+#root {
+  min-height: 100vh;
+  overflow-x: clip;
+}
+
+img,
+video {
+  max-width: 100%;
 }

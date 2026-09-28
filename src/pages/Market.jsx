@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { Link } from "react-router-dom";
 const navItems = ["Home", "Shop", "For Farmers", "About", "Contact"];
 
 const harvestCategories = [
@@ -174,6 +175,18 @@ const farmerBenefits = [
     description: "Escrow security, honest trade, and reduced food waste",
   },
 ];
+
+const getCategoryHref = (category) => {
+  if (category === "Honey") return "/product?search=Honey";
+
+  const categoryAliases = {
+    Dairy: "Livestock",
+    Herbs: "Vegetables",
+  };
+
+  return `/product?category=${encodeURIComponent(categoryAliases[category] || category)}`;
+};
+
 function Market() {
   const [showMoreCategories, setShowMoreCategories] = useState(false);
   const [selectedFarmer, setSelectedFarmer] = useState(null);
@@ -199,7 +212,7 @@ function Market() {
 
         <div className="grid items-center gap-12 lg:grid-cols-[1.13fr_0.87fr]">
           <div className="pt-6">
-            <h1 className="max-w-[770px] text-[3.4rem] font-black leading-[0.9] tracking-[-0.065em] text-[#123d2d] sm:text-[4.4rem] xl:text-[4.6rem]">
+            <h1 className="max-w-[770px] text-4xl font-black leading-tight text-[#123d2d] sm:text-5xl xl:text-6xl">
               <span className="block">Fresh Produce • Local</span>
               <span className="block">Farmers • Better</span>
               <span className="block">Communities</span>
@@ -210,10 +223,13 @@ function Market() {
               transparent escrow delivery.
             </p>
             <div className="mt-10 flex flex-wrap gap-4">
-              <button className="inline-flex h-[54px] items-center gap-3 rounded-[12px] bg-[#12642e] px-6 text-[1rem] font-bold text-white shadow-[0_6px_12px_rgba(12,67,34,0.2)] transition hover:bg-[#0d4d26]">
+              <Link
+                to="/product"
+                className="inline-flex h-[54px] items-center gap-3 rounded-[12px] bg-[#12642e] px-6 text-[1rem] font-bold text-white shadow-[0_6px_12px_rgba(12,67,34,0.2)] transition hover:bg-[#0d4d26]"
+              >
                 Shop Fresh Produce{" "}
                 <span className="text-xl font-normal">→</span>
-              </button>
+              </Link>
               <button className="inline-flex h-[54px] items-center gap-3 rounded-[12px] border-[2px] border-[#12642e] bg-transparent px-6 text-[1rem] font-bold text-[#12642e] transition hover:bg-[#ecf6ed]">
                 Meet Our Farmers
               </button>
@@ -286,13 +302,13 @@ function Market() {
                 pastures.
               </p>
             </div>
-            <a
-              href="#"
+            <Link
+              to="/product"
               className="hidden shrink-0 items-center gap-2 text-[0.9rem] font-bold text-[#12642e] transition hover:text-[#0d4d26] sm:flex"
             >
               View All 50 Products{" "}
               <span className="text-lg font-normal">›</span>
-            </a>
+            </Link>
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
@@ -322,9 +338,12 @@ function Market() {
                   <p className="mt-1.5 min-h-[48px] text-[0.84rem] leading-6 text-[#617968]">
                     {category.description}
                   </p>
-                  <button className="mt-5 h-[41px] w-full shrink-0 rounded-[12px] bg-[#fac449] text-[0.9rem] font-bold text-[#173d2b] transition hover:bg-[#f5b82d]">
+                  <Link
+                    to={getCategoryHref(category.name)}
+                    className="mt-5 flex h-[41px] w-full shrink-0 items-center justify-center rounded-[12px] bg-[#fac449] text-[0.9rem] font-bold text-[#173d2b] transition hover:bg-[#f5b82d]"
+                  >
                     Shop {category.name} <span className="text-base">→</span>
-                  </button>
+                  </Link>
                 </div>
               </article>
             ))}
@@ -357,9 +376,12 @@ function Market() {
                   <p className="mt-1.5 min-h-[48px] text-[0.84rem] leading-6 text-[#617968]">
                     {category.description}
                   </p>
-                  <button className="mt-5 h-[41px] w-full shrink-0 rounded-[12px] bg-[#fac449] text-[0.9rem] font-bold text-[#173d2b] transition hover:bg-[#f5b82d]">
+                  <Link
+                    to={getCategoryHref(category.name)}
+                    className="mt-5 flex h-[41px] w-full shrink-0 items-center justify-center rounded-[12px] bg-[#fac449] text-[0.9rem] font-bold text-[#173d2b] transition hover:bg-[#f5b82d]"
+                  >
                     Shop {category.name} <span className="text-base">→</span>
-                  </button>
+                  </Link>
                 </div>
               </article>
             ))}
@@ -376,38 +398,42 @@ function Market() {
                 className="overflow-hidden"
               >
                 <div className="mt-6 grid gap-6 md:grid-cols-3">
-              {additionalHarvestCategories.map((category) => (
-                <article
-                  key={category.name}
-                  className="overflow-hidden rounded-[16px] border border-[#e1e9dd] bg-[#fffdf5] shadow-[0_2px_5px_rgba(18,100,46,0.08)]"
-                >
-                  <div className="relative">
-                    <img
-                      src={category.image}
-                      alt={`${category.name} from local farms`}
-                      className="h-[218px] w-full object-cover"
-                    />
-                    <span className="absolute -bottom-5 left-6 flex h-12 w-12 items-center justify-center rounded-full border-2 border-white bg-[#12642e] shadow-sm">
-                      <img
-                        src={category.badgeImage}
-                        alt=""
-                        className="h-full w-full rounded-full object-cover"
-                      />
-                    </span>
-                  </div>
-                  <div className="flex h-[200px] flex-col p-7">
-                    <h3 className="text-[1.25rem] font-black text-[#12642e]">
-                      {category.name}
-                    </h3>
-                    <p className="mt-1.5 min-h-[48px] text-[0.84rem] leading-6 text-[#617968]">
-                      {category.description}
-                    </p>
-                    <button className="mt-5 h-[41px] w-full shrink-0 rounded-[12px] bg-[#fac449] text-[0.9rem] font-bold text-[#173d2b] transition hover:bg-[#12642e] hover:text-white">
-                      Shop {category.name} <span className="text-base">→</span>
-                    </button>
-                  </div>
-                </article>
-              ))}
+                  {additionalHarvestCategories.map((category) => (
+                    <article
+                      key={category.name}
+                      className="overflow-hidden rounded-[16px] border border-[#e1e9dd] bg-[#fffdf5] shadow-[0_2px_5px_rgba(18,100,46,0.08)]"
+                    >
+                      <div className="relative">
+                        <img
+                          src={category.image}
+                          alt={`${category.name} from local farms`}
+                          className="h-[218px] w-full object-cover"
+                        />
+                        <span className="absolute -bottom-5 left-6 flex h-12 w-12 items-center justify-center rounded-full border-2 border-white bg-[#12642e] shadow-sm">
+                          <img
+                            src={category.badgeImage}
+                            alt=""
+                            className="h-full w-full rounded-full object-cover"
+                          />
+                        </span>
+                      </div>
+                      <div className="flex h-[200px] flex-col p-7">
+                        <h3 className="text-[1.25rem] font-black text-[#12642e]">
+                          {category.name}
+                        </h3>
+                        <p className="mt-1.5 min-h-[48px] text-[0.84rem] leading-6 text-[#617968]">
+                          {category.description}
+                        </p>
+                        <Link
+                          to={getCategoryHref(category.name)}
+                          className="mt-5 flex h-[41px] w-full shrink-0 items-center justify-center rounded-[12px] bg-[#fac449] text-[0.9rem] font-bold text-[#173d2b] transition hover:bg-[#12642e] hover:text-white"
+                        >
+                          Shop {category.name}{" "}
+                          <span className="text-base">→</span>
+                        </Link>
+                      </div>
+                    </article>
+                  ))}
                 </div>
               </motion.div>
             )}

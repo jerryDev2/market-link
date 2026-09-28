@@ -1,5 +1,6 @@
 import React from "react";
 import "./App.css";
+import { AnimatePresence, motion, MotionConfig } from "framer-motion";
 import {
   BrowserRouter,
   Routes,
@@ -23,6 +24,7 @@ import CustomerDashboard from "./pages/CustomerDashboard";
 import CustomerProfile from "./pages/CustomerProfile";
 import CartPage from "./pages/CartPage.jsx";
 import OrderDetailsPage from "./pages/OrderDetailsPage.jsx";
+import ForgotPassword from "./pages/ForgotPassword.jsx";
 
 const getStoredUser = () => {
   try {
@@ -60,51 +62,66 @@ function AppLayout() {
   return (
     <>
       {!shouldHideLayout && <Header />}
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about-us" element={<AboutUs />} />
-        <Route path="/product" element={<Product />} />
-        <Route path="/productPage/:productId" element={<ProductPage />} />
-        <Route path="/market" element={<Market />} />
-        <Route path="/contact-us" element={<ContactUs />} />
-        <Route path="/signup" element={<Register />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/order-details/:orderId" element={<OrderDetailsPage />} />
-        <Route
-          path="/farmer-profile"
-          element={
-            <RequireAuth allowedRole="FARMER">
-              <FarmerProfile />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/farmer-dashboard"
-          element={
-            <RequireAuth allowedRole="FARMER">
-              <FarmerDashboard />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/customer-dashboard"
-          element={
-            <RequireAuth allowedRole="CUSTOMER">
-              <CustomerDashboard />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/customer-profile"
-          element={
-            <RequireAuth allowedRole="CUSTOMER">
-              <CustomerProfile />
-            </RequireAuth>
-          }
-        />
-      </Routes>
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={location.pathname}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.22, ease: "easeOut" }}
+          className="min-h-screen"
+        >
+          <Routes location={location}>
+            <Route path="/" element={<Home />} />
+            <Route path="/about-us" element={<AboutUs />} />
+            <Route path="/product" element={<Product />} />
+            <Route path="/productPage/:productId" element={<ProductPage />} />
+            <Route path="/market" element={<Market />} />
+            <Route path="/contact-us" element={<ContactUs />} />
+            <Route path="/signup" element={<Register />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route
+              path="/order-details/:orderId"
+              element={<OrderDetailsPage />}
+            />
+            <Route
+              path="/farmer-profile"
+              element={
+                <RequireAuth allowedRole="FARMER">
+                  <FarmerProfile />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/farmer-dashboard"
+              element={
+                <RequireAuth allowedRole="FARMER">
+                  <FarmerDashboard />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/customer-dashboard"
+              element={
+                <RequireAuth allowedRole="CUSTOMER">
+                  <CustomerDashboard />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/customer-profile"
+              element={
+                <RequireAuth allowedRole="CUSTOMER">
+                  <CustomerProfile />
+                </RequireAuth>
+              }
+            />
+          </Routes>
+        </motion.div>
+      </AnimatePresence>
       {!shouldHideLayout && <Footer />}
     </>
   );
@@ -112,9 +129,11 @@ function AppLayout() {
 
 function App() {
   return (
-    <BrowserRouter>
-      <AppLayout />
-    </BrowserRouter>
+    <MotionConfig reducedMotion="user">
+      <BrowserRouter>
+        <AppLayout />
+      </BrowserRouter>
+    </MotionConfig>
   );
 }
 
