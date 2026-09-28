@@ -5,7 +5,7 @@ function Avert() {
     <section className="px-4 pb-16 pt-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl overflow-hidden rounded-[28px]">
         <div
-          className="relative flex min-h-[360px] items-center justify-center overflow-hidden bg-blend-overlay bg-[#00000057] bg-cover bg-center bg-[url('/images/farm.jpg')]"
+          className="relative flex min-h-90 items-center justify-center overflow-hidden bg-blend-overlay bg-[#00000057] bg-cover bg-center bg-[url('/images/farm.jpg')]"
       
         >
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.18),transparent_52%)]" />
@@ -22,7 +22,7 @@ function Avert() {
               <input
                 type="text"
                 placeholder="Enter your email"
-                className="w-full border-0 bg-transparent px-5 py-3.5 text-sm text-[#1B1B1B] placeholder:text-[#4F5A52] outline-none"
+                className="w-full border-0 bg-transparent px-5 py-3.5 text-sm placeholder:text-[#4F5A52] outline-none"
               />
               <button
                 type="button"

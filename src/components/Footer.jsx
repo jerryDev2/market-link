@@ -20,7 +20,7 @@ function Footer() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(249,199,79,0.18),transparent_30%)]" />
       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.02),transparent,rgba(255,255,255,0.04))]" />
 
-      <div className="relative mx-auto max-w-[1400px] px-4 py-8 sm:px-6 lg:px-8">
+      <div className="relative mx-auto max-w-350 px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[1.2fr_1fr_1fr_1.3fr] lg:items-start">
           <div className="pr-6">
             <div className="mb-4 inline-flex items-center gap-2 rounded-xl border border-[#2E6B3F] bg-[#1D4F2B] px-3 py-2 shadow-[0_10px_30px_rgba(0,0,0,0.18)]">
@@ -93,11 +93,11 @@ function Footer() {
               <input
                 type="email"
                 placeholder="Your email"
-                className="w-full border-0 bg-transparent px-4 py-3.5 text-base text-[#F7F3E8] placeholder:text-[#CFEBD3] outline-none"
+                className="w-full border-0 bg-transparent px-4 py-3.5 text-base placeholder:text-[#CFEBD3] outline-none"
               />
               <button
                 type="button"
-                className="whitespace-nowrap bg-[#F9C74F] px-5 py-3 text-base font-semibold text-[#173E1A] transition hover:bg-[#f0bb39]"
+                className="whitespace-nowrap cursor-pointer bg-[#F9C74F] px-5 py-3 text-base font-semibold animate-pulse text-[#173E1A] transition hover:bg-[#f0bb39]"
               >
                 Subscribe
               </button>

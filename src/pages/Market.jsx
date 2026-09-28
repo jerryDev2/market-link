@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "react-router-dom";
-const navItems = ["Home", "Shop", "For Farmers", "About", "Contact"];
 
 const harvestCategories = [
   {
@@ -234,6 +233,7 @@ function Market() {
                 Meet Our Farmers
               </button>
             </div>
+
             <div className="mt-6 grid max-w-[730px] grid-cols-3 border-t border-[#d2ddcf] pt-4">
               <div>
                 <div className="text-[1.45rem] font-black leading-none text-[#12642e]">
@@ -272,7 +272,7 @@ function Market() {
                 }}
               />
               <div className="absolute inset-x-0 bottom-0 rounded-b-[24px] bg-[linear-gradient(180deg,rgba(13,44,26,0.05),rgba(13,44,26,0.9)_35%,rgba(13,44,26,0.96))] p-6">
-                <div className="mb-3 text-[0.76rem] font-bold uppercase tracking-[0.2em] text-[#dfeecf]">
+                <div className="mb-3 text-[0.76rem] font-bold tracking-[0.2em] text-[#dfeecf] uppercase">
                   ✦ Harvested at Dawn
                 </div>
                 <div className="max-w-[430px] text-[2.2rem] font-black leading-[1.1] tracking-[-0.05em] text-white sm:text-[2.6rem]">
@@ -287,6 +287,8 @@ function Market() {
         </div>
       </section>
 
+      {/* CATEGORIES */}
+
       <section
         id="explore-fresh-harvests"
         className="border-t border-[#e2e9dc] bg-[#fffdf5] px-5 py-10 lg:px-8 xl:px-12"
@@ -294,7 +296,7 @@ function Market() {
         <div className="mx-auto max-w-[1250px]">
           <div className="mb-8 flex items-end justify-between gap-6">
             <div>
-              <h2 className="text-[2rem] font-black leading-none tracking-[-0.04em] text-[#12642e] sm:text-[2.25rem]">
+              <h2 className="text-[2rem] leading-none font-black tracking-[-0.04em] text-[#12642e] sm:text-[2.25rem]">
                 Explore Our Fresh Harvests
               </h2>
               <p className="mt-2 text-[0.95rem] text-[#537060]">
@@ -438,12 +440,11 @@ function Market() {
               </motion.div>
             )}
           </AnimatePresence>
-
           <div className="mt-10 flex justify-center">
             <button
               type="button"
               onClick={() => setShowMoreCategories((current) => !current)}
-              className="rounded-[12px] bg-[#fac449] px-7 py-3 text-[0.95rem] font-black text-[#173d2b] transition hover:bg-[#d79f27] hover:text-[#173d2b]"
+              className="rounded-[12px] bg-[#fac449] px-7 py-3 text-[0.95rem] font-black text-[#173d2b] transition hover:bg-[#d79f27]"
             >
               {showMoreCategories ? "Show Less ↑" : "Load More Categories ↓"}
             </button>
@@ -455,7 +456,7 @@ function Market() {
         <div className="mx-auto max-w-[1250px]">
           <div className="mb-8 flex items-end justify-between gap-6">
             <div>
-              <h2 className="text-[2rem] font-black leading-none tracking-[-0.04em] text-[#12642e] sm:text-[2.25rem]">
+              <h2 className="text-[2rem] leading-none font-black tracking-[-0.04em] text-[#12642e] sm:text-[2.25rem]">
                 Meet Our Verified Farmers
               </h2>
               <p className="mt-2 text-[0.95rem] text-[#537060]">
@@ -506,7 +507,7 @@ function Market() {
                 <p className="mt-5 min-h-[42px] text-[0.74rem] leading-5 text-[#536c5d]">
                   {farmer.description}
                 </p>
-                <p className="mt-4 text-[0.65rem] font-bold uppercase tracking-[0.1em] text-[#617968]">
+                <p className="mt-4 text-[0.65rem] font-bold tracking-[0.1em] text-[#617968] uppercase">
                   Main farm produce
                 </p>
                 <div className="mt-2 flex flex-wrap gap-2">
@@ -563,10 +564,10 @@ function Market() {
       <section className="bg-[#fffdf5] px-5 py-16 lg:px-8 xl:px-12">
         <div className="mx-auto flex max-w-[1100px] flex-col gap-8 rounded-[22px] bg-[#176326] px-8 py-10 text-white shadow-[0_10px_24px_rgba(18,60,28,0.16)] sm:px-11 md:flex-row md:items-center md:justify-between">
           <div className="max-w-[700px]">
-            <p className="text-[0.7rem] font-bold uppercase tracking-[0.12em] text-[#fac449]">
+            <p className="text-[0.7rem] font-bold tracking-[0.12em] text-[#fac449] uppercase">
               ◇ Direct from source guarantee
             </p>
-            <h2 className="mt-3 text-[1.8rem] font-black leading-tight tracking-[-0.04em] sm:text-[2.1rem]">
+            <h2 className="mt-3 text-[1.8rem] leading-tight font-black tracking-[-0.04em] sm:text-[2.1rem]">
               Are you a Nigerian commercial or smallholder farmer?
             </h2>
             <p className="mt-3 max-w-[620px] text-[0.9rem] leading-5 text-[#cce9c8]">
@@ -598,7 +599,7 @@ function Market() {
               type="button"
               aria-label="Close farmer profile"
               onClick={() => setSelectedFarmer(null)}
-              className="absolute right-5 top-4 text-2xl text-[#537060] transition hover:text-[#12642e]"
+              className="absolute top-4 right-5 cursor-pointer text-2xl text-[#537060] transition hover:text-[#12642e]"
             >
               ×
             </button>
@@ -627,7 +628,7 @@ function Market() {
               {selectedFarmer.description}
             </p>
             <div className="mt-5 border-t border-[#e1e9dd] pt-4">
-              <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#617968]">
+              <p className="text-xs font-bold tracking-[0.1em] text-[#617968] uppercase">
                 Main farm produce
               </p>
               <div className="mt-2 flex flex-wrap gap-2">

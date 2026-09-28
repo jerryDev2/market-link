@@ -41,21 +41,21 @@ const categories = [
 ];
 
 function Categories() {
-  return (
+    return (
     <section
-      id="categories"
-      className="relative overflow-hidden bg-[#F5F9F3] py-20"
+        id="categories"
+        className="relative overflow-hidden bg-[#F5F9F3] py-20"
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-12 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-          <div className="max-w-xl">
-            <span className="inline-flex items-center rounded-full border border-[#CDE7D0] bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#1B5E20] shadow-sm">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="mb-12 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+                <div className="max-w-xl">
+            <span className="inline-flex items-center rounded-full border border-[#CDE7D0] bg-white px-3 py-1 text-[11px] font-semibold tracking-[0.18em] text-[#1B5E20] uppercase shadow-sm">
               Farm Categories
             </span>
-            <h2 className="mt-4 text-3xl font-black tracking-tight text-[#173E1A] sm:text-4xl">
-              Find your favorite harvest
-            </h2>
-          </div>
+                    <h2 className="mt-4 text-3xl font-black tracking-tight text-[#173E1A] sm:text-4xl">
+                        Find your favorite harvest
+                    </h2>
+                </div>
 
           <Link
             to="/product"
@@ -112,10 +112,10 @@ function Categories() {
               </motion.article>
             ),
           )}
+          </div>
         </div>
-      </div>
     </section>
-  );
+    )
 }
 
 export default Categories;
