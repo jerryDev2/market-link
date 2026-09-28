@@ -13,18 +13,33 @@ const getStoredUser = () => {
 
 function Header() {
   const [currentUser, setCurrentUser] = useState(() => getStoredUser());
+  const [cartCount, setCartCount] = useState(() =>
+    Number(localStorage.getItem("cartCount") || 0),
+  );
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const syncUser = () => setCurrentUser(getStoredUser());
+    const syncCart = () =>
+      setCartCount(Number(localStorage.getItem("cartCount") || 0));
+
     syncUser();
+    syncCart();
+
     window.addEventListener("storage", syncUser);
+    window.addEventListener("storage", syncCart);
     window.addEventListener("auth-change", syncUser);
+    window.addEventListener("auth-change", syncCart);
+    window.addEventListener("cart-updated", syncCart);
+
     return () => {
       window.removeEventListener("storage", syncUser);
+      window.removeEventListener("storage", syncCart);
       window.removeEventListener("auth-change", syncUser);
+      window.removeEventListener("auth-change", syncCart);
+      window.removeEventListener("cart-updated", syncCart);
     };
   }, []);
 
@@ -132,7 +147,16 @@ function Header() {
 
           {/* Cart */}
           <button
+            type="button"
             aria-label="Shopping cart"
+            onClick={() => {
+              if (!currentUser || !localStorage.getItem("token")) {
+                navigate("/login");
+                return;
+              }
+
+              navigate("/cart");
+            }}
             className="relative cursor-pointer text-white transition hover:text-[#F9C74F] "
           >
             <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
@@ -149,7 +173,7 @@ function Header() {
             </svg>
 
             <span className="absolute -right-2.5 -top-2 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-[#F9C74F] px-1 font-['Inter'] text-[9px] font-bold text-[#263238]">
-              0
+              {cartCount}
             </span>
           </button>
 

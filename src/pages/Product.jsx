@@ -23,6 +23,8 @@ function Product() {
     setCategory(ev.target.value);
   };
 
+ 
+
   useEffect(() => {
     const closeSortOptions = (event) => {
       if (!sortMenuRef.current?.contains(event.target)) {
@@ -77,6 +79,9 @@ function Product() {
     "Vegetables",
     "Livestock",
     "Grains",
+    "Tubers",
+    "Poutry",
+    ""
   ];
 
   return (

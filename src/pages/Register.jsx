@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+const apiUrl = (path) => `${API_BASE_URL}${path}`;
+
 const validatePassword = (password) => {
   if (password.length < 8) {
     return "Password must be at least 8 characters long.";
@@ -118,7 +121,7 @@ function Register() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("http://localhost:8080/api/user", {
+      const response = await fetch(apiUrl("/api/user"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

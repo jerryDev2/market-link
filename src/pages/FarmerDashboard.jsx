@@ -1,5 +1,10 @@
-import React, { useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Toaster, toast } from "sonner";
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+
+const apiUrl = (path) => `${API_BASE_URL}${path}`;
 
 const navItems = [
   "Overview",
@@ -12,16 +17,14 @@ const navItems = [
   "Logout",
 ];
 
-const productRows = [];
-
-const overviewCards = [
-  { label: "Products", value: "0" },
-  { label: "Orders", value: "0" },
-  { label: "Pending", value: "0" },
-  { label: "Revenue", value: "₦0" },
-];
-
-const recentOrders = [];
+const emptyProduct = {
+  name: "",
+  description: "",
+  category: "",
+  price: "",
+  quantity: "",
+  unit: "",
+};
 
 const orderStatuses = [
   "Pending",
@@ -31,72 +34,59 @@ const orderStatuses = [
   "Cancelled",
 ];
 
-const currentOrder = {
-  id: "#0000",
-  customer: "No customer yet",
-  items: [],
-  pickup: "No pickup scheduled",
-};
-
-const stockItems = [];
-
-const reviews = [
-  {
-    customer: "John",
-    rating: "★★★★★",
-    comment: "Very fresh tomatoes.",
-  },
-  {
-    customer: "Mary",
-    rating: "★★★★★",
-    comment: "The peppers are always crisp and clean.",
-  },
-  {
-    customer: "Derrick",
-    rating: "★★★★☆",
-    comment: "Pickup was smooth and on time.",
-  },
-];
-
-const insightStats = {
-  totalOrders: 0,
-  completedOrders: 0,
-  revenue: "₦0",
-  topProducts: [],
-};
-
-const productFormFields = [
-  "Product Name",
-  "Category",
-  "Price",
-  "Unit",
-  "Quantity",
-  "Description",
-  "Image",
-];
-
 const getStoredUser = () => {
   try {
     const rawUser = localStorage.getItem("user");
-    return rawUser ? JSON.parse(rawUser) : null;
+
+    if (!rawUser) {
+      return null;
+    }
+
+    return JSON.parse(rawUser);
   } catch (error) {
+    console.error("Error reading stored user:", error);
     return null;
   }
 };
 
-const getDisplayName = (user) => {
-  if (!user) return "Farmer";
 
-  const firstName = user.firstName || user.firstname || "";
-  const lastName = user.lastName || user.lastname || "";
-  const nameFromUser = user.name || user.fullName || user.fullname || "";
 
-  if (firstName || lastName) {
-    return `${firstName} ${lastName}`.trim() || "Farmer";
+const getFirstName = (user) => {
+  if (!user) {
+    return "";
   }
 
-  if (nameFromUser) {
-    return nameFromUser;
+  return (user.firstName || user.firstname || user.first_name || "").trim();
+};
+
+
+
+const getLastName = (user) => {
+  if (!user) {
+    return "";
+  }
+
+  return (user.lastName || user.lastname || user.last_name || "").trim();
+};
+
+
+
+const getDisplayName = (user) => {
+  if (!user) {
+    return "Farmer";
+  }
+
+  const firstName = getFirstName(user);
+  const lastName = getLastName(user);
+
+  if (firstName || lastName) {
+    return `${firstName} ${lastName}`.trim();
+  }
+
+  const name = user.name || user.fullName || user.fullname || "";
+
+  if (name) {
+    return name;
   }
 
   if (user.email) {
@@ -106,45 +96,760 @@ const getDisplayName = (user) => {
   return "Farmer";
 };
 
+
+
+const normalizeFarmerProfile = (profile) => {
+  if (!profile) {
+    return null;
+  }
+
+  const nestedUser = profile.user || {};
+
+  const firstName =
+    profile.firstName ||
+    nestedUser.firstName ||
+    nestedUser.firstname ||
+    nestedUser.first_name ||
+    "";
+
+  const lastName =
+    profile.lastName ||
+    nestedUser.lastName ||
+    nestedUser.lastname ||
+    nestedUser.last_name ||
+    "";
+
+  return {
+    firstName,
+
+    lastName,
+
+    name:
+      profile.name ||
+      profile.fullName ||
+      profile.fullname ||
+      nestedUser.name ||
+      `${firstName} ${lastName}`.trim(),
+
+    profileImage:
+      profile.profileImage ||
+      profile.avatar ||
+      profile.profileImageUrl ||
+      profile.imageUrl ||
+      nestedUser.profileImage ||
+      nestedUser.avatar ||
+      nestedUser.profileImageUrl ||
+      nestedUser.imageUrl ||
+      "",
+
+    farmName:
+      profile.farmName ||
+      profile.businessName ||
+      profile.stallName ||
+      nestedUser.farmName ||
+      nestedUser.businessName ||
+      nestedUser.stallName ||
+      "",
+
+    location:
+      profile.location ||
+      profile.marketLocation ||
+      profile.farmLocation ||
+      profile.address ||
+      nestedUser.location ||
+      nestedUser.marketLocation ||
+      "",
+
+    description:
+      profile.description ||
+      profile.bio ||
+      profile.about ||
+      nestedUser.description ||
+      nestedUser.bio ||
+      "",
+
+    phoneNumber:
+      profile.phoneNumber ||
+      profile.phone ||
+      nestedUser.phoneNumber ||
+      nestedUser.phone ||
+      "",
+
+    email: profile.email || nestedUser.email || "",
+  };
+};
+
+
+
+const buildOverviewCards = (productCount = 0) => [
+  {
+    label: "Products",
+    value: String(productCount),
+  },
+  {
+    label: "Orders",
+    value: "0",
+  },
+  {
+    label: "Pending",
+    value: "0",
+  },
+  {
+    label: "Revenue",
+    value: "₦0",
+  },
+];
+
+
+
 function FarmerDashboard() {
-  const [activeTab, setActiveTab] = useState("Overview");
-  const [showProductForm, setShowProductForm] = useState(false);
-  const [accepted, setAccepted] = useState(false);
   const navigate = useNavigate();
 
-  const user = getStoredUser();
-  const farmerName = getDisplayName(user);
-  const farmerEmail = user?.email || "farmer@marketlink.com";
+
+
+  const [activeTab, setActiveTab] = useState("Overview");
+
+
+  const [storedUser, setStoredUser] = useState(() => getStoredUser());
+
+
+
+  const [products, setProducts] = useState([]);
+
+  const [showProductForm, setShowProductForm] = useState(false);
+
+  const [product, setProduct] = useState(emptyProduct);
+
+  const [image, setImage] = useState(null);
+
+  const [imagePreview, setImagePreview] = useState("");
+
+  const [loading, setLoading] = useState(false);
+
+ 
+
+  const [farmerProfile, setFarmerProfile] = useState(null);
+
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+
+  const [profileImageFile, setProfileImageFile] = useState(null);
+
+  const [profileImagePreview, setProfileImagePreview] = useState("");
+
+  const [profileForm, setProfileForm] = useState({
+    profileImage: "",
+    farmName: "",
+    location: "",
+    description: "",
+    phoneNumber: "",
+    email: "",
+  });
+
+
+
+  const user = storedUser;
+
+  const normalizedUser = normalizeFarmerProfile(user);
+
+  const normalizedProfile = normalizeFarmerProfile(farmerProfile);
+
+
+
+  const firstName = normalizedProfile?.firstName || getFirstName(user) || "";
+
+  const lastName = normalizedProfile?.lastName || getLastName(user) || "";
+
+  const farmerName =
+    `${firstName} ${lastName}`.trim() ||
+    getDisplayName(normalizedProfile || user);
+
+  const farmerEmail = normalizedProfile?.email || user?.email || "";
+
   const farmName =
+    normalizedProfile?.farmName ||
     user?.farmName ||
     user?.businessName ||
     user?.stallName ||
-    "MarketLink Farm";
+    "";
+
+
+  const getFarmerProfile = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        console.warn("No JWT token found.");
+
+        return null;
+      }
+
+      const response = await fetch(apiUrl("/api/farmer-profile/me"), {
+        method: "GET",
+
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 401 || response.status === 403) {
+        console.error("JWT expired or unauthorized.");
+
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+
+        window.dispatchEvent(new Event("auth-change"));
+
+        navigate("/");
+
+        return null;
+      }
+
+      if (!response.ok) {
+        const errorText = await response.text();
+
+        console.error("Farmer profile error:", errorText);
+
+        throw new Error("Failed to fetch farmer profile");
+      }
+
+      const data = await response.json();
+
+      console.log("Raw farmer profile:", data);
+
+      const normalized = normalizeFarmerProfile(data);
+
+      setFarmerProfile(normalized);
+
+    
+      if (normalized?.firstName || normalized?.lastName) {
+        const updatedUser = {
+          ...user,
+
+          firstName: normalized.firstName || getFirstName(user),
+
+          lastName: normalized.lastName || getLastName(user),
+
+          profileImage: normalized.profileImage || user?.profileImage || "",
+        };
+
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+
+        setStoredUser(updatedUser);
+      }
+
+      return normalized;
+    } catch (error) {
+      console.error("Error fetching farmer profile:", error);
+
+      return null;
+    }
+  };
+
+
+
+  const loadProducts = async () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      console.warn("No token found when loading products.");
+
+      return;
+    }
+
+    try {
+      const response = await fetch(apiUrl("/api/product/my-products"), {
+        method: "GET",
+
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 401 || response.status === 403) {
+        console.error("Unauthorized while loading products.");
+
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error("Failed to load products");
+      }
+
+      const payload = await response.json();
+
+      const productList = Array.isArray(payload)
+        ? payload
+        : payload.products || payload.data || [];
+
+      const normalizedProducts = productList.map((item) => ({
+        id: item.productId || item.id || Math.random().toString(36).slice(2),
+
+        image:
+          item.imageUrl ||
+          item.image ||
+          item.productImage ||
+          item.image_path ||
+          item.photo ||
+          "",
+
+        name: item.name || "Unnamed product",
+
+        description: item.description || "No description provided.",
+
+        category: item.category || "Uncategorized",
+
+        price: item.price ?? 0,
+
+        unit: item.unit || "unit",
+
+        quantity: item.quantity ?? 0,
+      }));
+
+      setProducts(normalizedProducts);
+
+      console.log("Products loaded:", normalizedProducts);
+    } catch (error) {
+      console.error("Product fetch error:", error);
+
+      setProducts([]);
+    }
+  };
+
+
+
+  useEffect(() => {
+    loadProducts();
+    getFarmerProfile();
+  }, []);
+
+  
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+
+    setProduct((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+  };
+
+
+
+  const handleImageChange = (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    setImage(file);
+
+    /*
+     * Revoke old preview first.
+     */
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
+
+    const preview = URL.createObjectURL(file);
+
+    setImagePreview(preview);
+  };
+
+
+
+  useEffect(() => {
+    return () => {
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview]);
+
+ 
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!image) {
+      toast.error("Please select a product image before saving.");
+
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      toast.error("Please sign in again to continue.");
+
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const formData = new FormData();
+
+      formData.append("name", product.name);
+
+      formData.append("description", product.description);
+
+      formData.append("category", product.category);
+
+      formData.append("price", product.price);
+
+      formData.append("quantity", product.quantity);
+
+      formData.append("unit", product.unit);
+
+      formData.append("image", image);
+
+      const response = await fetch(apiUrl("/api/product"), {
+        method: "POST",
+
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+
+        body: formData,
+      });
+
+      if (response.status === 401 || response.status === 403) {
+        toast.error("Your session has expired. Please sign in again.");
+
+        handleLogout();
+
+        return;
+      }
+
+      if (!response.ok) {
+        const errorText = await response.text();
+
+        console.error("Backend error:", errorText);
+
+        throw new Error("Failed to add product");
+      }
+
+      const savedProduct = await response.json();
+
+      console.log("Product saved:", savedProduct);
+
+      await loadProducts();
+
+      closeProductForm();
+
+      toast.success("Product added successfully.");
+    } catch (error) {
+      console.error("Error adding product:", error);
+
+      toast.error(
+        error.message || "Something went wrong while adding your product.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  const closeProductForm = () => {
+    setShowProductForm(false);
+
+    setProduct(emptyProduct);
+
+    setImage(null);
+
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
+
+    setImagePreview("");
+  };
+
+ 
+
+  useEffect(() => {
+    const source = normalizedProfile || normalizedUser || {};
+
+    setProfileForm({
+      profileImage: source.profileImage || "",
+
+      farmName: source.farmName || "",
+
+      location: source.location || "",
+
+      description: source.description || "",
+
+      phoneNumber: source.phoneNumber || "",
+
+      email: source.email || user?.email || "",
+    });
+
+    /*
+     * Backend image is a real URL.
+     * We only use this as the preview when
+     * there is no newly selected file.
+     */
+    setProfileImagePreview(source.profileImage || "");
+  }, [farmerProfile, storedUser]);
+
+ 
+
+  const handleProfileFormChange = (event) => {
+    const { name, value } = event.target;
+
+    setProfileForm((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+  };
+
+ 
+
+  const handleProfileImageUpload = (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    setProfileImageFile(file);
+
+    /*
+     * Remove previous temporary preview.
+     */
+    if (profileImagePreview && profileImagePreview.startsWith("blob:")) {
+      URL.revokeObjectURL(profileImagePreview);
+    }
+
+    const preview = URL.createObjectURL(file);
+
+    setProfileImagePreview(preview);
+  };
+
+ 
+
+  useEffect(() => {
+    return () => {
+      if (profileImagePreview && profileImagePreview.startsWith("blob:")) {
+        URL.revokeObjectURL(profileImagePreview);
+      }
+    };
+  }, [profileImagePreview]);
+
+
+ const saveFarmerProfile = async () => {
+   const token = localStorage.getItem("token");
+
+   if (!token) {
+     alert("Please login first.");
+     return;
+   }
+
+   try {
+     setLoading(true);
+
+     const formData = new FormData();
+
+     formData.append("farmName", profileForm.farmName || "");
+     formData.append("location", profileForm.location || "");
+     formData.append("description", profileForm.description || "");
+     formData.append("phoneNumber", profileForm.phoneNumber || "");
+
+     /*
+      * Only append image when the farmer
+      * actually selected a new image.
+      */
+     if (profileImageFile) {
+       formData.append("profileImage", profileImageFile);
+     }
+
+     const response = await fetch(apiUrl("/api/farmer-profile/me"), {
+       method: "PUT",
+
+       headers: {
+         Authorization: `Bearer ${token}`,
+       },
+
+       body: formData,
+     });
+
+     if (response.status === 401 || response.status === 403) {
+       localStorage.removeItem("token");
+       localStorage.removeItem("user");
+
+       window.dispatchEvent(new Event("auth-change"));
+
+       navigate("/");
+
+       return;
+     }
+
+     if (!response.ok) {
+       const errorText = await response.text();
+
+       console.error("Profile update error:", errorText);
+
+       throw new Error("Failed to update farmer profile");
+     }
+
+     const savedProfile = await response.json();
+
+     console.log("PROFILE SAVED:", savedProfile);
+
+     /*
+      * The response now contains:
+      *
+      * firstName
+      * lastName
+      * email
+      * phoneNumber
+      * farmName
+      * location
+      * description
+      * profileImage
+      *
+      * profileImage should now be a Cloudinary URL.
+      */
+
+     setFarmerProfile(savedProfile);
+
+     /*
+      * Update localStorage user.
+      */
+     const currentUser = getStoredUser() || {};
+
+     const updatedUser = {
+       ...currentUser,
+
+       firstName: savedProfile.firstName || currentUser.firstName,
+
+       lastName: savedProfile.lastName || currentUser.lastName,
+
+       email: savedProfile.email || currentUser.email,
+
+       phoneNumber: savedProfile.phoneNumber || currentUser.phoneNumber,
+
+       farmName: savedProfile.farmName,
+
+       location: savedProfile.location,
+
+       description: savedProfile.description,
+
+       profileImage: savedProfile.profileImage,
+     };
+
+     localStorage.setItem("user", JSON.stringify(updatedUser));
+
+     setStoredUser(updatedUser);
+
+     /*
+      * Remove the temporary browser file.
+      */
+     setProfileImageFile(null);
+
+     /*
+      * Use the REAL Cloudinary URL.
+      */
+     setProfileForm((prev) => ({
+       ...prev,
+
+       profileImage: savedProfile.profileImage || "",
+
+       farmName: savedProfile.farmName || "",
+
+       location: savedProfile.location || "",
+
+       description: savedProfile.description || "",
+
+       phoneNumber: savedProfile.phoneNumber || "",
+
+       email: savedProfile.email || "",
+     }));
+
+     setIsEditingProfile(false);
+
+     alert("Profile updated successfully!");
+   } catch (error) {
+     console.error("Error saving farmer profile:", error);
+
+     alert(error.message);
+   } finally {
+     setLoading(false);
+   }
+ };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+
     localStorage.removeItem("user");
+
     window.dispatchEvent(new Event("auth-change"));
+
     navigate("/");
   };
 
+
+
+  const handleProfileClick = async () => {
+    await getFarmerProfile();
+
+    setActiveTab("Profile");
+  };
+
+
+
+  const stockItemsList = products.map((item) => ({
+    name: item.name,
+
+    qty: `${item.quantity} ${item.unit}`,
+  }));
+
+
+
+  const overviewCards = useMemo(
+    () => buildOverviewCards(products.length),
+    [products.length],
+  );
+
+
+
   const headerLabel = useMemo(() => {
-    if (activeTab === "Overview") return "Overview";
-    if (activeTab === "Products") return "My Products";
-    if (activeTab === "Orders") return "Orders";
-    if (activeTab === "Stock") return "Weekly Stock";
-    if (activeTab === "Reviews") return "Customer Reviews";
-    if (activeTab === "Insights") return "Sales Overview";
-    return "Farmer Dashboard";
+    switch (activeTab) {
+      case "Products":
+        return "My Products";
+
+      case "Orders":
+        return "Orders";
+
+      case "Stock":
+        return "Weekly Stock";
+
+      case "Reviews":
+        return "Customer Reviews";
+
+      case "Insights":
+        return "Sales Overview";
+
+      case "Profile":
+        return "Farmer Profile";
+
+      case "Overview":
+      default:
+        return "Overview";
+    }
   }, [activeTab]);
+
+
 
   const renderOverview = () => (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <p className="text-sm text-[#4A5E4F]">Welcome, {farmerName} 👋</p>
-          <h2 className="mt-2 text-3xl font-bold text-[#173E1A]">Overview</h2>
-        </div>
+      <div>
+        <p className="text-sm text-[#4A5E4F]">
+          Welcome,{" "}
+          <span className="font-semibold text-[#1B5E20]">{farmerName}</span> 👋
+        </p>
+
+        <h2 className="mt-2 text-3xl font-bold text-[#173E1A]">Overview</h2>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -154,6 +859,7 @@ function FarmerDashboard() {
             className="rounded-[20px] border border-[#E7F1E8] bg-white p-5 shadow-[0_12px_28px_rgba(27,94,32,0.06)]"
           >
             <p className="text-sm text-[#4A5E4F]">{card.label}</p>
+
             <p className="mt-2 text-3xl font-bold text-[#173E1A]">
               {card.value}
             </p>
@@ -163,38 +869,26 @@ function FarmerDashboard() {
 
       <div className="rounded-[22px] border border-[#E7F1E8] bg-white p-5 shadow-[0_12px_28px_rgba(27,94,32,0.06)]">
         <h3 className="mb-3 text-xl font-bold text-[#173E1A]">Recent Orders</h3>
-        {recentOrders.length === 0 ? (
-          <p className="text-sm text-[#4A5E4F]">No recent orders yet.</p>
-        ) : (
-          <div className="space-y-3">
-            {recentOrders.map((order) => (
-              <div
-                key={order.id}
-                className="flex items-center justify-between rounded-xl bg-[#F7F9F3] px-4 py-3"
-              >
-                <span className="font-medium text-[#173E1A]">
-                  Order {order.id}
-                </span>
-                <span className="rounded-full bg-[#E8F5E9] px-2.5 py-1 text-xs font-semibold text-[#1B5E20]">
-                  {order.status}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
+
+        <p className="text-sm text-[#4A5E4F]">No recent orders yet.</p>
       </div>
 
       <div className="rounded-[22px] border border-[#E7F1E8] bg-white p-5 shadow-[0_12px_28px_rgba(27,94,32,0.06)]">
         <p className="text-sm text-[#4A5E4F]">Farm</p>
-        <p className="mt-2 text-2xl font-bold text-[#173E1A]">{farmName}</p>
+
+        <p className="mt-2 text-2xl font-bold text-[#173E1A]">
+          {farmName || "My Farm"}
+        </p>
       </div>
     </div>
   );
+
 
   const renderProducts = () => (
     <div className="space-y-5">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-3xl font-bold text-[#173E1A]">My Products</h2>
+
         <button
           onClick={() => setShowProductForm(true)}
           className="rounded-xl bg-[#1B5E20] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#154a1a]"
@@ -203,215 +897,270 @@ function FarmerDashboard() {
         </button>
       </div>
 
-      {showProductForm ? (
-        <div className="rounded-[22px] border border-[#E7F1E8] bg-white p-5 shadow-[0_12px_28px_rgba(27,94,32,0.06)]">
+      {showProductForm && (
+        <form
+          onSubmit={handleSubmit}
+          className="rounded-[22px] border border-[#E7F1E8] bg-white p-5 shadow-[0_12px_28px_rgba(27,94,32,0.06)]"
+        >
           <h3 className="mb-4 text-xl font-bold text-[#173E1A]">Add Product</h3>
+
           <div className="grid gap-4 md:grid-cols-2">
-            {productFormFields.map((field) => (
-              <div
-                key={field}
-                className={
-                  field === "Description" || field === "Image"
-                    ? "md:col-span-2"
-                    : ""
-                }
-              >
-                <label className="mb-2 block text-sm font-medium text-[#2F443B]">
-                  {field}
-                </label>
-                <input
-                  type={
-                    field === "Price" || field === "Quantity"
-                      ? "number"
-                      : field === "Image"
-                        ? "file"
-                        : "text"
-                  }
-                  placeholder={
-                    field === "Price"
-                      ? "0"
-                      : field === "Image"
-                        ? "Upload product image"
-                        : ""
-                  }
-                  className="w-full rounded-xl border border-[#E7F1E8] bg-[#F9FBF8] px-3.5 py-3 text-sm text-[#173E1A] outline-none transition focus:border-[#2E7D32] focus:ring-2 focus:ring-[#A5D6A7]/50"
+            <div>
+              <label className="mb-2 block text-sm font-medium text-[#2F443B]">
+                Product name
+              </label>
+
+              <input
+                type="text"
+                name="name"
+                value={product.name}
+                onChange={handleChange}
+                placeholder="Tomatoes"
+                className="w-full rounded-xl border border-[#E7F1E8] bg-[#F9FBF8] px-3.5 py-3 text-sm text-[#173E1A] outline-none focus:border-[#2E7D32]"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-[#2F443B]">
+                Category
+              </label>
+
+              <input
+                type="text"
+                name="category"
+                value={product.category}
+                onChange={handleChange}
+                placeholder="Vegetables"
+                className="w-full rounded-xl border border-[#E7F1E8] bg-[#F9FBF8] px-3.5 py-3 text-sm text-[#173E1A] outline-none focus:border-[#2E7D32]"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-[#2F443B]">
+                Price
+              </label>
+
+              <input
+                type="number"
+                name="price"
+                value={product.price}
+                onChange={handleChange}
+                min="0"
+                placeholder="0"
+                className="w-full rounded-xl border border-[#E7F1E8] bg-[#F9FBF8] px-3.5 py-3 text-sm text-[#173E1A] outline-none focus:border-[#2E7D32]"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-[#2F443B]">
+                Quantity
+              </label>
+
+              <input
+                type="number"
+                name="quantity"
+                value={product.quantity}
+                onChange={handleChange}
+                min="0"
+                placeholder="0"
+                className="w-full rounded-xl border border-[#E7F1E8] bg-[#F9FBF8] px-3.5 py-3 text-sm text-[#173E1A] outline-none focus:border-[#2E7D32]"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-[#2F443B]">
+                Unit
+              </label>
+
+              <input
+                type="text"
+                name="unit"
+                value={product.unit}
+                onChange={handleChange}
+                placeholder="kg, bunch, crate"
+                className="w-full rounded-xl border border-[#E7F1E8] bg-[#F9FBF8] px-3.5 py-3 text-sm text-[#173E1A] outline-none focus:border-[#2E7D32]"
+                required
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="mb-2 block text-sm font-medium text-[#2F443B]">
+                Description
+              </label>
+
+              <textarea
+                rows="3"
+                name="description"
+                value={product.description}
+                onChange={handleChange}
+                placeholder="Freshly harvested tomatoes"
+                className="w-full rounded-xl border border-[#E7F1E8] bg-[#F9FBF8] px-3.5 py-3 text-sm text-[#173E1A] outline-none focus:border-[#2E7D32]"
+                required
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="mb-2 block text-sm font-medium text-[#2F443B]">
+                Product image
+              </label>
+
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="w-full rounded-xl border border-[#E7F1E8] p-2 text-sm"
+                required
+              />
+
+              {imagePreview ? (
+                <img
+                  src={imagePreview}
+                  alt={product.name || "Product preview"}
+                  className="mt-4 h-52 w-full rounded-xl object-cover"
                 />
-              </div>
-            ))}
+              ) : (
+                <div className="mt-4 flex h-52 items-center justify-center rounded-xl bg-[#F3F8F3] text-sm text-[#4A5E4F]">
+                  Image preview will appear here
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="mt-5 flex justify-end gap-3">
             <button
-              onClick={() => setShowProductForm(false)}
+              type="button"
+              onClick={closeProductForm}
               className="rounded-xl border border-[#1B5E20] bg-white px-4 py-2.5 text-sm font-semibold text-[#1B5E20]"
             >
               Cancel
             </button>
-            <button className="rounded-xl bg-[#F9C74F] px-4 py-2.5 text-sm font-semibold text-[#173E1A]">
-              Add Product
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="rounded-xl bg-[#F9C74F] px-4 py-2.5 text-sm font-semibold text-[#173E1A]"
+            >
+              {loading ? "Adding..." : "Add Product"}
             </button>
           </div>
-        </div>
-      ) : null}
+        </form>
+      )}
 
-      {productRows.length === 0 ? (
-        <div className="rounded-[22px] border border-[#E7F1E8] bg-white p-5 shadow-[0_12px_28px_rgba(27,94,32,0.06)]">
+      {products.length === 0 ? (
+        <div className="rounded-[22px] border border-[#E7F1E8] bg-white p-5">
           <p className="text-sm text-[#4A5E4F]">No products added yet.</p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-[22px] border border-[#E7F1E8] bg-white shadow-[0_12px_28px_rgba(27,94,32,0.06)]">
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-left">
-              <thead className="bg-[#EAF3EB] text-sm uppercase tracking-[0.08em] text-[#1B5E20]">
-                <tr>
-                  <th className="px-5 py-3">Product</th>
-                  <th className="px-5 py-3">Price</th>
-                  <th className="px-5 py-3">Stock</th>
-                  <th className="px-5 py-3">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {productRows.map((product) => (
-                  <tr key={product.name} className="border-t border-[#EDF4EE]">
-                    <td className="px-5 py-3 font-semibold text-[#173E1A]">
-                      {product.name}
-                    </td>
-                    <td className="px-5 py-3 text-[#3E5243]">
-                      {product.price}
-                    </td>
-                    <td className="px-5 py-3 text-[#3E5243]">
-                      {product.stock}
-                    </td>
-                    <td className="px-5 py-3">
-                      <div className="flex flex-wrap gap-2">
-                        <button className="rounded-lg border border-[#1B5E20] px-2.5 py-1.5 text-xs font-semibold text-[#1B5E20]">
-                          View
-                        </button>
-                        <button className="rounded-lg border border-[#1B5E20] px-2.5 py-1.5 text-xs font-semibold text-[#1B5E20]">
-                          Edit
-                        </button>
-                        <button className="rounded-lg border border-[#D34B4B] px-2.5 py-1.5 text-xs font-semibold text-[#D34B4B]">
-                          Delete
-                        </button>
-                        <button className="rounded-lg bg-[#F9C74F] px-2.5 py-1.5 text-xs font-semibold text-[#173E1A]">
-                          Mark Sold Out
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {products.map((item) => (
+            <div
+              key={item.id}
+              className="overflow-hidden rounded-[22px] border border-[#E7F1E8] bg-white shadow-sm"
+            >
+              {item.image ? (
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="h-52 w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-52 items-center justify-center bg-[#F3F8F3] text-sm text-[#4A5E4F]">
+                  No image
+                </div>
+              )}
+
+              <div className="space-y-3 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h3 className="text-lg font-bold text-[#173E1A]">
+                      {item.name}
+                    </h3>
+
+                    <p className="text-xs font-medium uppercase text-[#1B5E20]">
+                      {item.category}
+                    </p>
+                  </div>
+
+                  <span className="rounded-full bg-[#E8F5E9] px-2.5 py-1 text-xs font-semibold text-[#1B5E20]">
+                    {item.quantity} {item.unit}
+                  </span>
+                </div>
+
+                <p className="text-sm text-[#3E5243]">{item.description}</p>
+
+                <div className="flex items-center justify-between border-t border-[#EDF4EE] pt-3">
+                  <span className="text-sm text-[#4A5E4F]">Price</span>
+
+                  <span className="font-bold text-[#173E1A]">
+                    ₦{Number(item.price).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>
   );
 
+  /*
+  |--------------------------------------------------------------------------
+  | ORDERS
+  |--------------------------------------------------------------------------
+  */
+
   const renderOrders = () => (
     <div className="space-y-5">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="text-3xl font-bold text-[#173E1A]">Orders</h2>
-      </div>
+      <h2 className="text-3xl font-bold text-[#173E1A]">Orders</h2>
 
       <div className="flex flex-wrap gap-2">
         {orderStatuses.map((status) => (
           <button
             key={status}
-            className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-              status === "Pending"
-                ? "bg-[#F9C74F] text-[#173E1A]"
-                : "bg-[#EAF3EB] text-[#1B5E20]"
-            }`}
+            className="rounded-full bg-[#EAF3EB] px-4 py-2 text-sm font-semibold text-[#1B5E20]"
           >
             {status}
           </button>
         ))}
       </div>
 
-      <div className="rounded-[22px] border border-[#E7F1E8] bg-white p-5 shadow-[0_12px_28px_rgba(27,94,32,0.06)]">
-        <div className="flex items-center justify-between gap-3">
-          <h3 className="text-2xl font-bold text-[#173E1A]">
-            Order {currentOrder.id}
-          </h3>
-          <span className="rounded-full bg-[#FFF3CD] px-2.5 py-1 text-xs font-semibold text-[#8A6D1F]">
-            No orders yet
-          </span>
-        </div>
+      <div className="rounded-[22px] border border-[#E7F1E8] bg-white p-5">
+        <h3 className="text-xl font-bold text-[#173E1A]">No orders yet</h3>
 
-        <div className="mt-5 space-y-3 text-[#2F443B]">
-          <p>
-            <span className="font-semibold text-[#173E1A]">Customer:</span>{" "}
-            {currentOrder.customer}
-          </p>
-          <p>
-            <span className="font-semibold text-[#173E1A]">Products:</span>
-          </p>
-          {currentOrder.items.length === 0 ? (
-            <p className="text-sm text-[#4A5E4F]">No order items yet.</p>
-          ) : (
-            <ul className="list-disc space-y-1 pl-6">
-              {currentOrder.items.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          )}
-          <p>
-            <span className="font-semibold text-[#173E1A]">Pickup:</span>{" "}
-            {currentOrder.pickup}
-          </p>
-        </div>
-
-        <div className="mt-5 flex flex-wrap gap-3">
-          <button
-            onClick={() => setAccepted(true)}
-            className="rounded-xl bg-[#1B5E20] px-4 py-2.5 text-sm font-semibold text-white opacity-60"
-            disabled
-          >
-            Accept
-          </button>
-          <button
-            className="rounded-xl border border-[#1B5E20] bg-white px-4 py-2.5 text-sm font-semibold text-[#1B5E20] opacity-60"
-            disabled
-          >
-            Decline
-          </button>
-          {accepted ? (
-            <button className="rounded-xl bg-[#F9C74F] px-4 py-2.5 text-sm font-semibold text-[#173E1A]">
-              Mark as Ready
-            </button>
-          ) : null}
-        </div>
+        <p className="mt-3 text-sm text-[#4A5E4F]">
+          Customer orders will appear here.
+        </p>
       </div>
     </div>
   );
 
+  /*
+  |--------------------------------------------------------------------------
+  | STOCK
+  |--------------------------------------------------------------------------
+  */
+
   const renderStock = () => (
     <div className="space-y-5">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="text-3xl font-bold text-[#173E1A]">Weekly Stock</h2>
-        <button className="rounded-xl bg-[#1B5E20] px-4 py-2.5 text-sm font-semibold text-white">
-          Update Stock
-        </button>
-      </div>
+      <h2 className="text-3xl font-bold text-[#173E1A]">Weekly Stock</h2>
 
-      <div className="rounded-[22px] border border-[#E7F1E8] bg-white p-5 shadow-[0_12px_28px_rgba(27,94,32,0.06)]">
-        {stockItems.length === 0 ? (
+      <div className="rounded-[22px] border border-[#E7F1E8] bg-white p-5">
+        {stockItemsList.length === 0 ? (
           <p className="text-sm text-[#4A5E4F]">No stock yet.</p>
         ) : (
           <div className="space-y-3">
-            {stockItems.map((item) => (
+            {stockItemsList.map((item) => (
               <div
                 key={item.name}
                 className="flex items-center justify-between rounded-xl bg-[#F7F9F3] px-4 py-3"
               >
                 <span className="font-medium text-[#173E1A]">{item.name}</span>
-                <div className="flex items-center gap-3">
-                  <span className="text-[#3E5243]">{item.qty}</span>
-                  <button className="rounded-lg border border-[#1B5E20] px-2.5 py-1.5 text-xs font-semibold text-[#1B5E20]">
-                    Sold Out
-                  </button>
-                </div>
+
+                <span className="text-[#3E5243]">{item.qty}</span>
               </div>
             ))}
           </div>
@@ -420,253 +1169,528 @@ function FarmerDashboard() {
     </div>
   );
 
+  /*
+  |--------------------------------------------------------------------------
+  | REVIEWS
+  |--------------------------------------------------------------------------
+  */
+
   const renderReviews = () => (
     <div className="space-y-5">
       <h2 className="text-3xl font-bold text-[#173E1A]">Customer Reviews</h2>
 
-      <div className="space-y-4">
-        {reviews.map((review) => (
-          <div
-            key={review.customer}
-            className="rounded-[22px] border border-[#E7F1E8] bg-white p-5 shadow-[0_12px_28px_rgba(27,94,32,0.06)]"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <p className="font-bold text-[#173E1A]">
-                Customer: {review.customer}
-              </p>
-              <span className="text-[#F9C74F]">{review.rating}</span>
-            </div>
-            <p className="mt-3 text-lg italic text-[#2E4A3B]">
-              "{review.comment}"
-            </p>
-            <button className="mt-4 rounded-xl border border-[#1B5E20] bg-white px-4 py-2.5 text-sm font-semibold text-[#1B5E20]">
-              Reply
-            </button>
-          </div>
-        ))}
+      <div className="rounded-[22px] border border-[#E7F1E8] bg-white p-5">
+        <p className="text-sm text-[#4A5E4F]">
+          Customer reviews will appear here.
+        </p>
       </div>
     </div>
   );
+
+  /*
+  |--------------------------------------------------------------------------
+  | INSIGHTS
+  |--------------------------------------------------------------------------
+  */
 
   const renderInsights = () => (
     <div className="space-y-5">
       <h2 className="text-3xl font-bold text-[#173E1A]">Sales Overview</h2>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-[20px] border border-[#E7F1E8] bg-white p-5 shadow-[0_12px_28px_rgba(27,94,32,0.06)]">
-          <p className="text-sm text-[#4A5E4F]">Total Orders</p>
-          <p className="mt-2 text-3xl font-bold text-[#173E1A]">
-            {insightStats.totalOrders}
-          </p>
-        </div>
-        <div className="rounded-[20px] border border-[#E7F1E8] bg-white p-5 shadow-[0_12px_28px_rgba(27,94,32,0.06)]">
-          <p className="text-sm text-[#4A5E4F]">Completed Orders</p>
-          <p className="mt-2 text-3xl font-bold text-[#173E1A]">
-            {insightStats.completedOrders}
-          </p>
-        </div>
-        <div className="rounded-[20px] border border-[#E7F1E8] bg-white p-5 shadow-[0_12px_28px_rgba(27,94,32,0.06)]">
-          <p className="text-sm text-[#4A5E4F]">Revenue</p>
-          <p className="mt-2 text-3xl font-bold text-[#173E1A]">
-            {insightStats.revenue}
-          </p>
-        </div>
-      </div>
+        {[
+          ["Total Orders", "0"],
+          ["Completed Orders", "0"],
+          ["Revenue", "₦0"],
+        ].map(([label, value]) => (
+          <div
+            key={label}
+            className="rounded-[20px] border border-[#E7F1E8] bg-white p-5"
+          >
+            <p className="text-sm text-[#4A5E4F]">{label}</p>
 
-      <div className="rounded-[22px] border border-[#E7F1E8] bg-white p-5 shadow-[0_12px_28px_rgba(27,94,32,0.06)]">
-        <h3 className="text-xl font-bold text-[#173E1A]">
-          Best Selling Products
-        </h3>
-        {insightStats.topProducts.length === 0 ? (
-          <p className="mt-4 text-sm text-[#4A5E4F]">No sales data yet.</p>
-        ) : (
-          <ol className="mt-4 space-y-3 pl-6 text-[#2F443B]">
-            {insightStats.topProducts.map((product, index) => (
-              <li key={product} className="list-decimal text-base">
-                {index + 1}. {product}
-              </li>
-            ))}
-          </ol>
-        )}
+            <p className="mt-2 text-3xl font-bold text-[#173E1A]">{value}</p>
+          </div>
+        ))}
       </div>
     </div>
   );
 
+  /*
+  |--------------------------------------------------------------------------
+  | PROFILE
+  |--------------------------------------------------------------------------
+  */
+
   const renderProfile = () => {
-    const profileDetails = [
-      {
-        label: "Stall / Business name",
-        value:
-          user?.farmName ||
-          user?.businessName ||
-          user?.stallName ||
-          "MarketLink Farm",
-      },
-      {
-        label: "Contact information",
-        value: `${user?.phoneNumber || user?.phone || "+233 000 000 000"} · ${farmerEmail}`,
-      },
-      {
-        label: "Address",
-        value:
-          user?.address ||
-          user?.farmAddress ||
-          "No. 12 Farm Lane, Ashaiman, Greater Accra",
-      },
-      {
-        label: "Market location",
-        value: user?.marketLocation || "Agbogba Farmers Market · Stall A-07",
-      },
-      {
-        label: "Operating days",
-        value: user?.operatingDays || "Monday - Saturday",
-      },
-      {
-        label: "Pickup time windows",
-        value:
-          user?.pickupTimeWindows || "7:00 AM - 11:00 AM · 3:00 PM - 6:00 PM",
-      },
-    ];
+    const currentProfileImage =
+      profileImagePreview ||
+      profileForm.profileImage ||
+      normalizedProfile?.profileImage ||
+      user?.profileImage ||
+      "";
 
     return (
       <div className="space-y-5">
-        <div className="rounded-[22px] border border-[#E7F1E8] bg-white p-5 shadow-[0_12px_28px_rgba(27,94,32,0.06)]">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="text-sm text-[#4A5E4F]">Farmer profile</p>
-              <h2 className="mt-2 text-3xl font-bold text-[#173E1A]">
-                {farmerName}
-              </h2>
+        {/* PROFILE HEADER */}
+
+        <div className="rounded-[22px] border border-[#E7F1E8] bg-white p-5 shadow-sm">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-4">
+              {currentProfileImage ? (
+                <img
+                  src={currentProfileImage}
+                  alt={farmerName}
+                  className="h-20 w-20 rounded-full border-4 border-[#EAF3EB] object-cover"
+                />
+              ) : (
+                <div className="flex h-20 w-20 items-center justify-center rounded-full border-4 border-[#EAF3EB] bg-[#F3F8F3] text-2xl font-bold text-[#1B5E20]">
+                  {firstName?.charAt(0).toUpperCase() || "F"}
+                </div>
+              )}
+
+              <div>
+                <p className="text-sm text-[#4A5E4F]">Farmer profile</p>
+
+                {/* FIRST NAME + LAST NAME */}
+
+                <h2 className="mt-2 text-3xl font-bold text-[#173E1A]">
+                  {farmerName}
+                </h2>
+
+                <p className="mt-1 text-sm text-[#4A5E4F]">{farmerEmail}</p>
+              </div>
             </div>
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1B5E20] text-2xl font-bold text-white shadow-sm">
-              {farmerName.charAt(0).toUpperCase()}
+
+            <div className="rounded-2xl bg-[#EAF3EB] px-4 py-2 text-sm font-semibold text-[#1B5E20]">
+              {farmName || "My Farm"}
             </div>
           </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          {profileDetails.map((item) => (
-            <div
-              key={item.label}
-              className="rounded-[20px] border border-[#E7F1E8] bg-white p-5 shadow-[0_12px_28px_rgba(27,94,32,0.06)]"
-            >
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#1B5E20]">
-                {item.label}
-              </p>
-              <p className="mt-3 text-base font-medium text-[#263238]">
-                {item.value}
-              </p>
+        {!isEditingProfile ? (
+          <>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="rounded-[20px] border border-[#E7F1E8] bg-white p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#1B5E20]">
+                  First name
+                </p>
+
+                <p className="mt-3 font-medium text-[#263238]">
+                  {firstName || "Not provided"}
+                </p>
+              </div>
+
+              <div className="rounded-[20px] border border-[#E7F1E8] bg-white p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#1B5E20]">
+                  Last name
+                </p>
+
+                <p className="mt-3 font-medium text-[#263238]">
+                  {lastName || "Not provided"}
+                </p>
+              </div>
+
+              <div className="rounded-[20px] border border-[#E7F1E8] bg-white p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#1B5E20]">
+                  Farm name
+                </p>
+
+                <p className="mt-3 font-medium text-[#263238]">
+                  {profileForm.farmName || "Not provided"}
+                </p>
+              </div>
+
+              <div className="rounded-[20px] border border-[#E7F1E8] bg-white p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#1B5E20]">
+                  Location
+                </p>
+
+                <p className="mt-3 font-medium text-[#263238]">
+                  {profileForm.location || "Not provided"}
+                </p>
+              </div>
+
+              <div className="rounded-[20px] border border-[#E7F1E8] bg-white p-5 md:col-span-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#1B5E20]">
+                  Description
+                </p>
+
+                <p className="mt-3 font-medium text-[#263238]">
+                  {profileForm.description || "No description yet."}
+                </p>
+              </div>
+
+              <div className="rounded-[20px] border border-[#E7F1E8] bg-white p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#1B5E20]">
+                  Phone
+                </p>
+
+                <p className="mt-3 font-medium text-[#263238]">
+                  {profileForm.phoneNumber || "Not provided"}
+                </p>
+              </div>
+
+              <div className="rounded-[20px] border border-[#E7F1E8] bg-white p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#1B5E20]">
+                  Email
+                </p>
+
+                <p className="mt-3 font-medium text-[#263238]">
+                  {profileForm.email || farmerEmail || "Not provided"}
+                </p>
+              </div>
             </div>
-          ))}
-        </div>
+
+            <div className="flex justify-end">
+              <button
+                onClick={() => setIsEditingProfile(true)}
+                className="rounded-xl bg-[#1B5E20] px-4 py-2.5 text-sm font-semibold text-white"
+              >
+                Edit profile
+              </button>
+            </div>
+          </>
+        ) : (
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+
+              saveFarmerProfile();
+            }}
+            className="rounded-[22px] border border-[#E7F1E8] bg-white p-5 shadow-sm"
+          >
+            {/* PROFILE IMAGE */}
+
+            <div className="mb-6 flex justify-center">
+              <label className="relative flex h-28 w-28 cursor-pointer items-center justify-center overflow-hidden rounded-full border-4 border-[#EAF3EB] bg-[#F3F8F3]">
+                {profileImagePreview ? (
+                  <img
+                    src={profileImagePreview}
+                    alt="Profile preview"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <span className="text-3xl font-bold text-[#1B5E20]">
+                    {firstName?.charAt(0).toUpperCase() || "+"}
+                  </span>
+                )}
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleProfileImageUpload}
+                  className="hidden"
+                />
+
+                <span className="absolute bottom-0 right-0 rounded-full bg-[#1B5E20] px-2 py-1 text-[10px] font-semibold text-white">
+                  Change
+                </span>
+              </label>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              {/* FIRST NAME */}
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-[#2F443B]">
+                  First name
+                </label>
+
+                <input
+                  type="text"
+                  value={firstName}
+                  disabled
+                  className="w-full cursor-not-allowed rounded-xl border border-[#E7F1E8] bg-[#EEF3EE] px-3.5 py-3 text-sm text-[#173E1A]"
+                />
+              </div>
+
+              {/* LAST NAME */}
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-[#2F443B]">
+                  Last name
+                </label>
+
+                <input
+                  type="text"
+                  value={lastName}
+                  disabled
+                  className="w-full cursor-not-allowed rounded-xl border border-[#E7F1E8] bg-[#EEF3EE] px-3.5 py-3 text-sm text-[#173E1A]"
+                />
+              </div>
+
+              {/* FARM NAME */}
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-[#2F443B]">
+                  Farm name
+                </label>
+
+                <input
+                  type="text"
+                  name="farmName"
+                  value={profileForm.farmName}
+                  onChange={handleProfileFormChange}
+                  className="w-full rounded-xl border border-[#E7F1E8] bg-[#F9FBF8] px-3.5 py-3 text-sm text-[#173E1A] outline-none focus:border-[#2E7D32]"
+                />
+              </div>
+
+              {/* LOCATION */}
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-[#2F443B]">
+                  Location
+                </label>
+
+                <input
+                  type="text"
+                  name="location"
+                  value={profileForm.location}
+                  onChange={handleProfileFormChange}
+                  className="w-full rounded-xl border border-[#E7F1E8] bg-[#F9FBF8] px-3.5 py-3 text-sm text-[#173E1A] outline-none focus:border-[#2E7D32]"
+                />
+              </div>
+
+              {/* DESCRIPTION */}
+
+              <div className="md:col-span-2">
+                <label className="mb-2 block text-sm font-medium text-[#2F443B]">
+                  Description
+                </label>
+
+                <textarea
+                  rows="4"
+                  name="description"
+                  value={profileForm.description}
+                  onChange={handleProfileFormChange}
+                  placeholder="Tell customers about your farm..."
+                  className="w-full rounded-xl border border-[#E7F1E8] bg-[#F9FBF8] px-3.5 py-3 text-sm text-[#173E1A] outline-none focus:border-[#2E7D32]"
+                />
+              </div>
+
+              {/* PHONE */}
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-[#2F443B]">
+                  Phone number
+                </label>
+
+                <input
+                  type="text"
+                  name="phoneNumber"
+                  value={profileForm.phoneNumber}
+                  onChange={handleProfileFormChange}
+                  className="w-full rounded-xl border border-[#E7F1E8] bg-[#F9FBF8] px-3.5 py-3 text-sm text-[#173E1A] outline-none focus:border-[#2E7D32]"
+                />
+              </div>
+
+              {/* EMAIL */}
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-[#2F443B]">
+                  Email
+                </label>
+
+                <input
+                  type="email"
+                  name="email"
+                  value={profileForm.email}
+                  onChange={handleProfileFormChange}
+                  className="w-full rounded-xl border border-[#E7F1E8] bg-[#F9FBF8] px-3.5 py-3 text-sm text-[#173E1A] outline-none focus:border-[#2E7D32]"
+                />
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsEditingProfile(false);
+
+                  setProfileImageFile(null);
+
+                  setProfileImagePreview(profileForm.profileImage || "");
+                }}
+                className="rounded-xl border border-[#1B5E20] bg-white px-4 py-2.5 text-sm font-semibold text-[#1B5E20]"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="submit"
+                className="rounded-xl bg-[#1B5E20] px-4 py-2.5 text-sm font-semibold text-white"
+              >
+                Save changes
+              </button>
+            </div>
+          </form>
+        )}
       </div>
     );
   };
+
+  /*
+  |--------------------------------------------------------------------------
+  | TAB CONTENT
+  |--------------------------------------------------------------------------
+  */
 
   const renderTabContent = () => {
     switch (activeTab) {
       case "Products":
         return renderProducts();
+
       case "Orders":
         return renderOrders();
+
       case "Stock":
         return renderStock();
+
       case "Reviews":
         return renderReviews();
+
       case "Insights":
         return renderInsights();
+
       case "Profile":
         return renderProfile();
+
       case "Overview":
       default:
         return renderOverview();
     }
   };
 
+  /*
+  |--------------------------------------------------------------------------
+  | MAIN UI
+  |--------------------------------------------------------------------------
+  */
+
   return (
-    <div className="min-h-screen w-full bg-[#F5F8F4] px-0 py-0">
-      <div className="h-screen w-full overflow-hidden border-0 bg-[#121E15] shadow-none">
-        <div className="flex h-full w-full flex-col lg:flex-row">
-          <aside className="w-full border-b border-[#1F3324] bg-[#0F1D12] p-5 text-[#E9F5EA] lg:w-72 lg:border-b-0 lg:border-r">
-            <div className="flex items-center gap-3 pb-5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F9C74F] text-sm font-black text-[#173E1A]">
-                M
-              </div>
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#A5D6A7]">
-                  MarketLink
-                </p>
-              </div>
-            </div>
+    <>
+      <Toaster position="top-right" richColors closeButton theme="light" />
 
-            <nav className="space-y-2">
-              {navItems.map((item) => {
-                const active = item === activeTab;
+      <div className="min-h-screen w-full bg-[#F5F8F4]">
+        <div className="min-h-screen w-full bg-[#121E15]">
+          <div className="flex min-h-screen w-full flex-col lg:flex-row">
+            {/* SIDEBAR */}
 
-                return (
+            <aside className="w-full border-b border-[#1F3324] bg-[#0F1D12] p-5 text-[#E9F5EA] lg:min-h-screen lg:w-72 lg:border-b-0 lg:border-r">
+              <div className="flex items-center gap-3 pb-5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F9C74F] text-sm font-black text-[#173E1A]">
+                  M
+                </div>
+
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#A5D6A7]">
+                    MarketLink
+                  </p>
+                </div>
+              </div>
+
+              <nav className="space-y-2">
+                {navItems.map((item) => {
+                  const active = item === activeTab;
+
+                  return (
+                    <button
+                      key={item}
+                      onClick={() => {
+                        if (item === "Logout") {
+                          handleLogout();
+
+                          return;
+                        }
+
+                        if (item === "Products") {
+                          loadProducts();
+
+                          setActiveTab("Products");
+
+                          return;
+                        }
+
+                        if (item === "Profile") {
+                          handleProfileClick();
+
+                          return;
+                        }
+
+                        setActiveTab(item);
+                      }}
+                      className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm font-medium transition ${
+                        active
+                          ? "bg-[#1B5E20] text-white"
+                          : "text-[#D8E7DB] hover:bg-[#163A1F] hover:text-white"
+                      }`}
+                    >
+                      <span>{item}</span>
+
+                      <span
+                        className={`h-2 w-2 rounded-full ${
+                          active ? "bg-[#F9C74F]" : "bg-transparent"
+                        }`}
+                      />
+                    </button>
+                  );
+                })}
+              </nav>
+            </aside>
+
+            {/* MAIN */}
+
+            <main className="flex-1 overflow-y-auto bg-[#F7F9F3] p-5 sm:p-6 lg:p-8">
+              <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#1B5E20]">
+                    Farmer Dashboard
+                  </p>
+
+                  <h1 className="mt-2 text-3xl font-bold text-[#173E1A] sm:text-4xl">
+                    {headerLabel}
+                  </h1>
+
+                  {/* USER NAME */}
+
+                  <p className="mt-1 text-sm text-[#4A5E4F]">{farmerName}</p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3">
                   <button
-                    key={item}
-                    onClick={() => {
-                      if (item === "Logout") {
-                        handleLogout();
-                        return;
-                      }
-                      setActiveTab(item);
-                    }}
-                    className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm font-medium transition ${
-                      active
-                        ? "bg-[#1B5E20] text-white shadow-sm"
-                        : "text-[#D8E7DB] hover:bg-[#163A1F] hover:text-white"
-                    }`}
+                    onClick={() => setActiveTab("Overview")}
+                    className="rounded-xl border border-[#1B5E20] bg-white px-4 py-2.5 text-sm font-semibold text-[#1B5E20]"
                   >
-                    <span>{item}</span>
-                    <span
-                      className={`h-2 w-2 rounded-full ${active ? "bg-[#F9C74F]" : "bg-transparent"}`}
-                    />
+                    Overview
                   </button>
-                );
-              })}
-            </nav>
-          </aside>
 
-          <main className="flex-1 overflow-y-auto bg-[#F7F9F3] p-5 sm:p-6 lg:p-8">
-            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#1B5E20]">
-                  Farmer Dashboard
-                </p>
-                <h1 className="mt-2 text-3xl font-bold text-[#173E1A] sm:text-4xl">
-                  {headerLabel}
-                </h1>
+                  <button
+                    onClick={handleProfileClick}
+                    className="rounded-xl border border-[#1B5E20] bg-transparent px-4 py-2.5 text-sm font-semibold text-[#1B5E20]"
+                  >
+                    Profile
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setShowProductForm(true);
+
+                      setActiveTab("Products");
+                    }}
+                    className="rounded-xl bg-[#1B5E20] px-4 py-2.5 text-sm font-semibold text-white"
+                  >
+                    Add Product
+                  </button>
+                </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-3">
-                <button
-                  onClick={() => setActiveTab("Overview")}
-                  className="rounded-xl border border-[#1B5E20] bg-white px-4 py-2.5 text-sm font-semibold text-[#1B5E20]"
-                >
-                  Overview
-                </button>
-                <button
-                  onClick={() => setActiveTab("Profile")}
-                  className="rounded-xl border border-[#1B5E20] bg-transparent px-4 py-2.5 text-sm font-semibold text-[#1B5E20]"
-                >
-                  Profile
-                </button>
-                <button
-                  onClick={() => setShowProductForm(true)}
-                  className="rounded-xl bg-[#1B5E20] px-4 py-2.5 text-sm font-semibold text-white"
-                >
-                  Add Product
-                </button>
-              </div>
-            </div>
-
-            {renderTabContent()}
-          </main>
+              {renderTabContent()}
+            </main>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
