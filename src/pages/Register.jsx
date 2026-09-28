@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Check } from "lucide-react";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 const apiUrl = (path) => `${API_BASE_URL}${path}`;
@@ -212,7 +213,7 @@ function Register() {
                   className="rounded-2xl border border-[#E8F5E9] bg-[#FFFDF5]/75 p-4 shadow-sm backdrop-blur-sm"
                 >
                   <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#F9C74F] text-lg text-[#263238]">
-                    ✓
+                    <Check size={18} aria-hidden="true" />
                   </div>
                   <h3 className="text-base font-semibold text-[#1B5E20]">
                     {item.title}
