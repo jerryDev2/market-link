@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Toaster, toast } from "sonner";
+import { Hand } from "lucide-react";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 
@@ -49,8 +50,6 @@ const getStoredUser = () => {
   }
 };
 
-
-
 const getFirstName = (user) => {
   if (!user) {
     return "";
@@ -59,8 +58,6 @@ const getFirstName = (user) => {
   return (user.firstName || user.firstname || user.first_name || "").trim();
 };
 
-
-
 const getLastName = (user) => {
   if (!user) {
     return "";
@@ -68,8 +65,6 @@ const getLastName = (user) => {
 
   return (user.lastName || user.lastname || user.last_name || "").trim();
 };
-
-
 
 const getDisplayName = (user) => {
   if (!user) {
@@ -95,8 +90,6 @@ const getDisplayName = (user) => {
 
   return "Farmer";
 };
-
-
 
 const normalizeFarmerProfile = (profile) => {
   if (!profile) {
@@ -179,8 +172,6 @@ const normalizeFarmerProfile = (profile) => {
   };
 };
 
-
-
 const buildOverviewCards = (productCount = 0) => [
   {
     label: "Products",
@@ -200,19 +191,12 @@ const buildOverviewCards = (productCount = 0) => [
   },
 ];
 
-
-
 function FarmerDashboard() {
   const navigate = useNavigate();
 
-
-
   const [activeTab, setActiveTab] = useState("Overview");
 
-
   const [storedUser, setStoredUser] = useState(() => getStoredUser());
-
-
 
   const [products, setProducts] = useState([]);
 
@@ -225,8 +209,6 @@ function FarmerDashboard() {
   const [imagePreview, setImagePreview] = useState("");
 
   const [loading, setLoading] = useState(false);
-
- 
 
   const [farmerProfile, setFarmerProfile] = useState(null);
 
@@ -245,15 +227,11 @@ function FarmerDashboard() {
     email: "",
   });
 
-
-
   const user = storedUser;
 
   const normalizedUser = normalizeFarmerProfile(user);
 
   const normalizedProfile = normalizeFarmerProfile(farmerProfile);
-
-
 
   const firstName = normalizedProfile?.firstName || getFirstName(user) || "";
 
@@ -271,7 +249,6 @@ function FarmerDashboard() {
     user?.businessName ||
     user?.stallName ||
     "";
-
 
   const getFarmerProfile = async () => {
     try {
@@ -320,7 +297,6 @@ function FarmerDashboard() {
 
       setFarmerProfile(normalized);
 
-    
       if (normalized?.firstName || normalized?.lastName) {
         const updatedUser = {
           ...user,
@@ -344,8 +320,6 @@ function FarmerDashboard() {
       return null;
     }
   };
-
-
 
   const loadProducts = async () => {
     const token = localStorage.getItem("token");
@@ -415,14 +389,10 @@ function FarmerDashboard() {
     }
   };
 
-
-
   useEffect(() => {
     loadProducts();
     getFarmerProfile();
   }, []);
-
-  
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -432,8 +402,6 @@ function FarmerDashboard() {
       [name]: value,
     }));
   };
-
-
 
   const handleImageChange = (event) => {
     const file = event.target.files?.[0];
@@ -456,8 +424,6 @@ function FarmerDashboard() {
     setImagePreview(preview);
   };
 
-
-
   useEffect(() => {
     return () => {
       if (imagePreview) {
@@ -465,8 +431,6 @@ function FarmerDashboard() {
       }
     };
   }, [imagePreview]);
-
- 
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -550,7 +514,6 @@ function FarmerDashboard() {
     }
   };
 
-
   const closeProductForm = () => {
     setShowProductForm(false);
 
@@ -564,8 +527,6 @@ function FarmerDashboard() {
 
     setImagePreview("");
   };
-
- 
 
   useEffect(() => {
     const source = normalizedProfile || normalizedUser || {};
@@ -592,8 +553,6 @@ function FarmerDashboard() {
     setProfileImagePreview(source.profileImage || "");
   }, [farmerProfile, storedUser]);
 
- 
-
   const handleProfileFormChange = (event) => {
     const { name, value } = event.target;
 
@@ -602,8 +561,6 @@ function FarmerDashboard() {
       [name]: value,
     }));
   };
-
- 
 
   const handleProfileImageUpload = (event) => {
     const file = event.target.files?.[0];
@@ -626,8 +583,6 @@ function FarmerDashboard() {
     setProfileImagePreview(preview);
   };
 
- 
-
   useEffect(() => {
     return () => {
       if (profileImagePreview && profileImagePreview.startsWith("blob:")) {
@@ -636,147 +591,146 @@ function FarmerDashboard() {
     };
   }, [profileImagePreview]);
 
+  const saveFarmerProfile = async () => {
+    const token = localStorage.getItem("token");
 
- const saveFarmerProfile = async () => {
-   const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Please login first.");
+      return;
+    }
 
-   if (!token) {
-     alert("Please login first.");
-     return;
-   }
+    try {
+      setLoading(true);
 
-   try {
-     setLoading(true);
+      const formData = new FormData();
 
-     const formData = new FormData();
+      formData.append("farmName", profileForm.farmName || "");
+      formData.append("location", profileForm.location || "");
+      formData.append("description", profileForm.description || "");
+      formData.append("phoneNumber", profileForm.phoneNumber || "");
 
-     formData.append("farmName", profileForm.farmName || "");
-     formData.append("location", profileForm.location || "");
-     formData.append("description", profileForm.description || "");
-     formData.append("phoneNumber", profileForm.phoneNumber || "");
+      /*
+       * Only append image when the farmer
+       * actually selected a new image.
+       */
+      if (profileImageFile) {
+        formData.append("profileImage", profileImageFile);
+      }
 
-     /*
-      * Only append image when the farmer
-      * actually selected a new image.
-      */
-     if (profileImageFile) {
-       formData.append("profileImage", profileImageFile);
-     }
+      const response = await fetch(apiUrl("/api/farmer-profile/me"), {
+        method: "PUT",
 
-     const response = await fetch(apiUrl("/api/farmer-profile/me"), {
-       method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
 
-       headers: {
-         Authorization: `Bearer ${token}`,
-       },
+        body: formData,
+      });
 
-       body: formData,
-     });
+      if (response.status === 401 || response.status === 403) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
 
-     if (response.status === 401 || response.status === 403) {
-       localStorage.removeItem("token");
-       localStorage.removeItem("user");
+        window.dispatchEvent(new Event("auth-change"));
 
-       window.dispatchEvent(new Event("auth-change"));
+        navigate("/");
 
-       navigate("/");
+        return;
+      }
 
-       return;
-     }
+      if (!response.ok) {
+        const errorText = await response.text();
 
-     if (!response.ok) {
-       const errorText = await response.text();
+        console.error("Profile update error:", errorText);
 
-       console.error("Profile update error:", errorText);
+        throw new Error("Failed to update farmer profile");
+      }
 
-       throw new Error("Failed to update farmer profile");
-     }
+      const savedProfile = await response.json();
 
-     const savedProfile = await response.json();
+      console.log("PROFILE SAVED:", savedProfile);
 
-     console.log("PROFILE SAVED:", savedProfile);
+      /*
+       * The response now contains:
+       *
+       * firstName
+       * lastName
+       * email
+       * phoneNumber
+       * farmName
+       * location
+       * description
+       * profileImage
+       *
+       * profileImage should now be a Cloudinary URL.
+       */
 
-     /*
-      * The response now contains:
-      *
-      * firstName
-      * lastName
-      * email
-      * phoneNumber
-      * farmName
-      * location
-      * description
-      * profileImage
-      *
-      * profileImage should now be a Cloudinary URL.
-      */
+      setFarmerProfile(savedProfile);
 
-     setFarmerProfile(savedProfile);
+      /*
+       * Update localStorage user.
+       */
+      const currentUser = getStoredUser() || {};
 
-     /*
-      * Update localStorage user.
-      */
-     const currentUser = getStoredUser() || {};
+      const updatedUser = {
+        ...currentUser,
 
-     const updatedUser = {
-       ...currentUser,
+        firstName: savedProfile.firstName || currentUser.firstName,
 
-       firstName: savedProfile.firstName || currentUser.firstName,
+        lastName: savedProfile.lastName || currentUser.lastName,
 
-       lastName: savedProfile.lastName || currentUser.lastName,
+        email: savedProfile.email || currentUser.email,
 
-       email: savedProfile.email || currentUser.email,
+        phoneNumber: savedProfile.phoneNumber || currentUser.phoneNumber,
 
-       phoneNumber: savedProfile.phoneNumber || currentUser.phoneNumber,
+        farmName: savedProfile.farmName,
 
-       farmName: savedProfile.farmName,
+        location: savedProfile.location,
 
-       location: savedProfile.location,
+        description: savedProfile.description,
 
-       description: savedProfile.description,
+        profileImage: savedProfile.profileImage,
+      };
 
-       profileImage: savedProfile.profileImage,
-     };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
 
-     localStorage.setItem("user", JSON.stringify(updatedUser));
+      setStoredUser(updatedUser);
 
-     setStoredUser(updatedUser);
+      /*
+       * Remove the temporary browser file.
+       */
+      setProfileImageFile(null);
 
-     /*
-      * Remove the temporary browser file.
-      */
-     setProfileImageFile(null);
+      /*
+       * Use the REAL Cloudinary URL.
+       */
+      setProfileForm((prev) => ({
+        ...prev,
 
-     /*
-      * Use the REAL Cloudinary URL.
-      */
-     setProfileForm((prev) => ({
-       ...prev,
+        profileImage: savedProfile.profileImage || "",
 
-       profileImage: savedProfile.profileImage || "",
+        farmName: savedProfile.farmName || "",
 
-       farmName: savedProfile.farmName || "",
+        location: savedProfile.location || "",
 
-       location: savedProfile.location || "",
+        description: savedProfile.description || "",
 
-       description: savedProfile.description || "",
+        phoneNumber: savedProfile.phoneNumber || "",
 
-       phoneNumber: savedProfile.phoneNumber || "",
+        email: savedProfile.email || "",
+      }));
 
-       email: savedProfile.email || "",
-     }));
+      setIsEditingProfile(false);
 
-     setIsEditingProfile(false);
+      alert("Profile updated successfully!");
+    } catch (error) {
+      console.error("Error saving farmer profile:", error);
 
-     alert("Profile updated successfully!");
-   } catch (error) {
-     console.error("Error saving farmer profile:", error);
-
-     alert(error.message);
-   } finally {
-     setLoading(false);
-   }
- };
+      alert(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -788,15 +742,11 @@ function FarmerDashboard() {
     navigate("/");
   };
 
-
-
   const handleProfileClick = async () => {
     await getFarmerProfile();
 
     setActiveTab("Profile");
   };
-
-
 
   const stockItemsList = products.map((item) => ({
     name: item.name,
@@ -804,14 +754,10 @@ function FarmerDashboard() {
     qty: `${item.quantity} ${item.unit}`,
   }));
 
-
-
   const overviewCards = useMemo(
     () => buildOverviewCards(products.length),
     [products.length],
   );
-
-
 
   const headerLabel = useMemo(() => {
     switch (activeTab) {
@@ -839,14 +785,17 @@ function FarmerDashboard() {
     }
   }, [activeTab]);
 
-
-
   const renderOverview = () => (
     <div className="space-y-6">
       <div>
         <p className="text-sm text-[#4A5E4F]">
           Welcome,{" "}
-          <span className="font-semibold text-[#1B5E20]">{farmerName}</span> 👋
+          <span className="font-semibold text-[#1B5E20]">{farmerName}</span>{" "}
+          <Hand
+            size={16}
+            className="inline text-[#1B5E20]"
+            aria-hidden="true"
+          />
         </p>
 
         <h2 className="mt-2 text-3xl font-bold text-[#173E1A]">Overview</h2>
@@ -882,7 +831,6 @@ function FarmerDashboard() {
       </div>
     </div>
   );
-
 
   const renderProducts = () => (
     <div className="space-y-5">

@@ -25,6 +25,9 @@ import CustomerProfile from "./pages/CustomerProfile";
 import CartPage from "./pages/CartPage.jsx";
 import OrderDetailsPage from "./pages/OrderDetailsPage.jsx";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
+import VerifyEmail from "./pages/VerifyEmail.jsx";
+import ResetPassword from "./pages/ResetPassword.jsx";
+
 
 const getStoredUser = () => {
   try {
@@ -114,7 +117,9 @@ function AppLayout() {
             <Route path="/signup" element={<Register />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/cart" element={<CartPage />} />
             <Route
               path="/order-details/:orderId"

@@ -1,13 +1,12 @@
 import { Link } from "react-router-dom";
 import background from "../assets/images/background1.jpg";
-import { motion } from "motion/react";
+import {motion} from "motion/react";
 
 function HeroSection() {
-  return (
-    <section id="home-hero" className="overflow-hidden bg-[#FFFDF5]">
-      <div className="relative mx-auto min-h-162.5 overflow-hidden">
-        {/* Decorative background */}
-        {/* <div className="pointer-events-none absolute -right-40 -top-40 h-[500px] w-[500px] rounded-full bg-[#E8F5E9]" />
+    return (<section className="overflow-hidden bg-[#FFFDF5]">
+        <div className="relative mx-auto min-h-162.5 overflow-hidden">
+            {/* Decorative background */}
+            {/* <div className="pointer-events-none absolute -right-40 -top-40 h-[500px] w-[500px] rounded-full bg-[#E8F5E9]" />
 
         <div className="pointer-events-none absolute -bottom-48 -left-40 h-[500px] w-[500px] rounded-full bg-[#A5D6A7]/30" /> */}
 
@@ -65,12 +64,12 @@ function HeroSection() {
               </Link>
             </div>
 
-            {/* Trust indicators */}
-            <div className="mt-12 flex flex-wrap items-center gap-6 sm:gap-8">
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#E8F5E9]">
-                  <span className="text-lg">🌱</span>
-                </div>
+                    {/* Trust indicators */}
+                    <div className="mt-12 flex flex-wrap items-center gap-6 sm:gap-8">
+                        <div className="flex items-center gap-2.5">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#E8F5E9]">
+                                <span className="text-lg">🌱</span>
+                            </div>
 
                 <div>
                   <p className="font-['Poppins'] text-xs font-semibold text-[#1B5E20]">
@@ -85,10 +84,10 @@ function HeroSection() {
 
               <div className="hidden h-8 w-px bg-[#C8DCC9] sm:block" />
 
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#E8F5E9]">
-                  <span className="text-lg">🚚</span>
-                </div>
+                        <div className="flex items-center gap-2.5">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#E8F5E9]">
+                                <span className="text-lg">🚚</span>
+                            </div>
 
                 <div>
                   <p className="font-['Poppins'] text-xs font-semibold text-[#1B5E20]">
@@ -145,12 +144,12 @@ function HeroSection() {
               </div>
             </motion.div>
 
-            {/* Floating card */}
-            <div className="absolute right-5 bottom-7 z-10 w-[230px] rounded-2xl border border-white/60 bg-[#FFFDF5]/95 p-4 shadow-[0_15px_40px_rgba(27,94,32,0.18)] backdrop-blur-md sm:right-8 sm:bottom-10 sm:w-65 lg:right-12 lg:bottom-12">
-              <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#E8F5E9] text-2xl">
-                  🥬
-                </div>
+                    {/* Floating card */}
+                    <div className="absolute right-5 bottom-7 z-10 w-[230px] rounded-2xl border border-white/60 bg-[#FFFDF5]/95 p-4 shadow-[0_15px_40px_rgba(27,94,32,0.18)] backdrop-blur-md sm:right-8 sm:bottom-10 sm:w-65 lg:right-12 lg:bottom-12">
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#E8F5E9] text-2xl">
+                                🥬
+                            </div>
 
                 <div>
                   <p className="font-['Poppins'] text-xs font-semibold text-[#1B5E20]">
@@ -162,51 +161,50 @@ function HeroSection() {
                   </p>
                 </div>
 
-                <div className="ml-auto flex h-7 w-7 items-center justify-center rounded-full bg-[#1B5E20] text-xs text-white">
-                  ✓
+                            <div className="ml-auto flex h-7 w-7 items-center justify-center rounded-full bg-[#1B5E20] text-xs text-white">
+                                ✓
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
         </div>
-      </div>
 
-      {/* Brand strip */}
-      <div className="brand-strip border-[#D9E8DA] bg-[#E8F5E9]">
-        <div className="strip-inner">
-          {[0, 1].map((copy) => (
-            <div
-              key={copy}
-              aria-hidden={copy === 1}
-              className="flex shrink-0 items-center gap-x-8 px-6 py-4 lg:px-10"
-            >
-              <p className="font-['Poppins'] text-xs font-semibold text-[#1B5E20]">
-                🌱 Fresh Produce
-              </p>
+        {/* Brand strip */}
+        <div className="brand-strip border-[#D9E8DA] bg-[#E8F5E9]">
+            <div className="strip-inner flex max-w-300 flex-wra items-center justify-center gap-x-8 gap-y-3 px-6 py-4 sm:justify-between lg:px-10">
 
-              <span className="hidden h-4 w-px bg-[#A5D6A7] sm:block" />
 
-              <p className="font-['Poppins'] text-xs font-semibold text-[#1B5E20]">
-                👨‍🌾 Local Farmers
-              </p>
+                <p className="font-['Poppins'] text-xs font-semibold text-[#1B5E20]">
+                    🌱 Fresh Produce
+                </p>
 
-              <span className="hidden h-4 w-px bg-[#A5D6A7] sm:block" />
+                <span className="hidden h-4 w-px bg-[#A5D6A7] sm:block"/>
 
-              <p className="font-['Poppins'] text-xs font-semibold text-[#1B5E20]">
-                🤝 Better Communities
-              </p>
+                <p className="font-['Poppins'] text-xs font-semibold text-[#1B5E20]">
+                    👨‍🌾 Local Farmers
+                </p>
 
-              <span className="hidden h-4 w-px bg-[#A5D6A7] sm:block" />
+                <span className="hidden h-4 w-px bg-[#A5D6A7] sm:block"/>
 
-              <p className="font-['Poppins'] text-xs font-semibold text-[#1B5E20]">
-                💚 Shop With Purpose
-              </p>
+                <p className="font-['Poppins'] text-xs font-semibold text-[#1B5E20]">
+                    🤝 Better Communities
+                </p>
+
+                <span className="hidden h-4 w-px bg-[#A5D6A7] sm:block"/>
+
+                <p className="font-['Poppins'] text-xs font-semibold text-[#1B5E20]">
+                    💚 Shop With Purpose
+                </p>
+
+
+
+
+
+
             </div>
-          ))}
         </div>
-      </div>
-    </section>
-  );
+    </section>);
 }
 
 export default HeroSection;

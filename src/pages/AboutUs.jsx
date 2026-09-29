@@ -1,29 +1,39 @@
 import React from "react";
+import {
+  BadgeCheck,
+  Check,
+  Leaf,
+  MapPin,
+  MessageCircle,
+  Package,
+  Target,
+  Wheat,
+} from "lucide-react";
 
 const whyChooseUsData = [
   {
-    icon: "🌱",
+    icon: Leaf,
     title: "Direct from Farmers",
     description:
       "Connect directly with local farmers and get the freshest, seasonal produce from nearby farms.",
     image: "/images/local-farmer.jfif",
   },
   {
-    icon: "📍",
+    icon: MapPin,
     title: "Find Markets & Farmers",
     description:
       "Discover nearby farmers markets and locate farmers using integrated maps with directions.",
     image: "/images/showcase.jfif",
   },
   {
-    icon: "📦",
+    icon: Package,
     title: "Pre-Order Convenience",
     description:
       "Reserve your favorite items in advance and pick them up at your preferred market time.",
     image: "/images/farmer%20phone.jfif",
   },
   {
-    icon: "💬",
+    icon: MessageCircle,
     title: "Community Connection",
     description:
       "Leave reviews, build relationships with farmers, and support your local community.",
@@ -80,20 +90,20 @@ function AboutUs() {
                 </p>
 
                 <div className="mt-8 flex flex-wrap justify-start gap-3">
-                  <span className="inline-flex items-center rounded-full bg-[#E8F5E9] px-4 py-2 text-sm font-semibold text-[#1B5E20]">
-                    🌾 Local First
+                  <span className="inline-flex items-center gap-2 rounded-full bg-[#E8F5E9] px-4 py-2 text-sm font-semibold text-[#1B5E20]">
+                    <Wheat size={16} aria-hidden="true" /> Local First
                   </span>
-                  <span className="inline-flex items-center rounded-full bg-[#E8F5E9] px-4 py-2 text-sm font-semibold text-[#1B5E20]">
-                    📍 Community Driven
+                  <span className="inline-flex items-center gap-2 rounded-full bg-[#E8F5E9] px-4 py-2 text-sm font-semibold text-[#1B5E20]">
+                    <MapPin size={16} aria-hidden="true" /> Community Driven
                   </span>
-                  <span className="inline-flex items-center rounded-full bg-[#E8F5E9] px-4 py-2 text-sm font-semibold text-[#1B5E20]">
-                    🎯 Transparent
+                  <span className="inline-flex items-center gap-2 rounded-full bg-[#E8F5E9] px-4 py-2 text-sm font-semibold text-[#1B5E20]">
+                    <Target size={16} aria-hidden="true" /> Transparent
                   </span>
                 </div>
 
                 <div className="mt-8 flex items-center gap-4 rounded-[20px] bg-[#FFFDF5] p-4 shadow-sm ring-1 ring-[#E8F5E9]">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#F9C74F] text-2xl">
-                    ✓
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#F9C74F] text-[#1B5E20]">
+                    <BadgeCheck size={25} aria-hidden="true" />
                   </div>
                   <div>
                     <p className="text-sm font-medium uppercase tracking-[0.12em] text-[#1B5E20]">
@@ -161,7 +171,12 @@ function AboutUs() {
                   <ul className="mt-5 space-y-3">
                     {section.points.map((point, pointIdx) => (
                       <li key={pointIdx} className="flex gap-3">
-                        <span className="text-lg text-[#F9C74F]">•</span>
+                        <span
+                          className="mt-1 text-[#F9C74F]"
+                          aria-hidden="true"
+                        >
+                          •
+                        </span>
                         <span className="text-[#263238]">{point}</span>
                       </li>
                     ))}
@@ -206,10 +221,38 @@ function AboutUs() {
                   <div className="rounded-xl border border-[#1B5E20]/20 bg-white/80 p-4 backdrop-blur-sm">
                     <p className="font-semibold text-[#1B5E20]">For Farmers</p>
                     <ul className="mt-3 space-y-2 text-sm text-[#263238]">
-                      <li>✓ Publish weekly inventory and pricing</li>
-                      <li>✓ Manage pre-orders and customer relationships</li>
-                      <li>✓ Plan harvest based on actual demand</li>
-                      <li>✓ Build a loyal customer base</li>
+                      <li className="flex items-start gap-2">
+                        <Check
+                          size={16}
+                          className="mt-0.5 shrink-0 text-[#1B5E20]"
+                          aria-hidden="true"
+                        />
+                        Publish weekly inventory and pricing
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check
+                          size={16}
+                          className="mt-0.5 shrink-0 text-[#1B5E20]"
+                          aria-hidden="true"
+                        />
+                        Manage pre-orders and customer relationships
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check
+                          size={16}
+                          className="mt-0.5 shrink-0 text-[#1B5E20]"
+                          aria-hidden="true"
+                        />
+                        Plan harvest based on actual demand
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check
+                          size={16}
+                          className="mt-0.5 shrink-0 text-[#1B5E20]"
+                          aria-hidden="true"
+                        />
+                        Build a loyal customer base
+                      </li>
                     </ul>
                   </div>
                   <div className="rounded-xl border border-[#1B5E20]/20 bg-white/80 p-4 backdrop-blur-sm">
@@ -217,10 +260,38 @@ function AboutUs() {
                       For Customers
                     </p>
                     <ul className="mt-3 space-y-2 text-sm text-[#263238]">
-                      <li>✓ Browse nearby markets and farmers</li>
-                      <li>✓ Search and filter available products</li>
-                      <li>✓ Reserve items for pickup in advance</li>
-                      <li>✓ Track orders and leave reviews</li>
+                      <li className="flex items-start gap-2">
+                        <Check
+                          size={16}
+                          className="mt-0.5 shrink-0 text-[#1B5E20]"
+                          aria-hidden="true"
+                        />
+                        Browse nearby markets and farmers
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check
+                          size={16}
+                          className="mt-0.5 shrink-0 text-[#1B5E20]"
+                          aria-hidden="true"
+                        />
+                        Search and filter available products
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check
+                          size={16}
+                          className="mt-0.5 shrink-0 text-[#1B5E20]"
+                          aria-hidden="true"
+                        />
+                        Reserve items for pickup in advance
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check
+                          size={16}
+                          className="mt-0.5 shrink-0 text-[#1B5E20]"
+                          aria-hidden="true"
+                        />
+                        Track orders and leave reviews
+                      </li>
                     </ul>
                   </div>
                 </div>
@@ -254,7 +325,9 @@ function AboutUs() {
                   className="h-40 w-full object-cover"
                 />
                 <div className="p-5">
-                  <p className="text-4xl">{item.icon}</p>
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#E8F5E9] text-[#1B5E20]">
+                    <item.icon size={23} aria-hidden="true" />
+                  </div>
                   <h3 className="mt-4 text-lg font-bold text-[#1B5E20]">
                     {item.title}
                   </h3>
@@ -269,7 +342,6 @@ function AboutUs() {
       </div>
 
       {/* Impact Section */}
-
 
       {/* CTA Section */}
     </div>

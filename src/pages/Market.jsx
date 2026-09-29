@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { BadgeCheck, Leaf, MapPin, Sparkles, Sprout, Star } from "lucide-react";
 
 const harvestCategories = [
   {
@@ -159,17 +160,17 @@ const verifiedFarmers = [
 
 const farmerBenefits = [
   {
-    icon: "✣",
+    icon: <Sprout size={20} aria-hidden="true" />,
     title: "Fresh & Natural",
     description: "100% farm-fresh produce, picked and harvested daily",
   },
   {
-    icon: "♧",
+    icon: <Leaf size={20} aria-hidden="true" />,
     title: "Local Farmers",
     description: "Empowering smallholders with fair, direct market pricing",
   },
   {
-    icon: "✓",
+    icon: <BadgeCheck size={20} aria-hidden="true" />,
     title: "Better Communities",
     description: "Escrow security, honest trade, and reduced food waste",
   },
@@ -205,7 +206,7 @@ function Market() {
     <main className="min-h-screen bg-[#dfe8d5] text-[#193d2c]">
       <section className="mx-auto max-w-[1500px] px-5 pb-16 pt-10 lg:px-8 xl:px-12">
         <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-[#2c6a4c] bg-[#e9f0e5] px-4 py-2 text-[0.72rem] font-bold uppercase tracking-[0.26em] text-[#0e5e2c]">
-          <span className="text-base">✦</span>
+          <Sparkles size={16} aria-hidden="true" />
           Direct Farm-to-door Marketplace
         </div>
 
@@ -273,7 +274,12 @@ function Market() {
               />
               <div className="absolute inset-x-0 bottom-0 rounded-b-[24px] bg-[linear-gradient(180deg,rgba(13,44,26,0.05),rgba(13,44,26,0.9)_35%,rgba(13,44,26,0.96))] p-6">
                 <div className="mb-3 text-[0.76rem] font-bold tracking-[0.2em] text-[#dfeecf] uppercase">
-                  ✦ Harvested at Dawn
+                  <Sparkles
+                    size={14}
+                    className="mr-1 inline"
+                    aria-hidden="true"
+                  />
+                  Harvested at Dawn
                 </div>
                 <div className="max-w-[430px] text-[2.2rem] font-black leading-[1.1] tracking-[-0.05em] text-white sm:text-[2.6rem]">
                   Taste the Real Nigerian Farm Freshness
@@ -491,14 +497,23 @@ function Market() {
                         {farmer.name}
                       </h3>
                       <span className="rounded-full bg-[#dff1df] px-2 py-0.5 text-[0.65rem] font-bold text-[#12642e]">
-                        ✓ Verified
+                        <BadgeCheck
+                          size={13}
+                          className="mr-1 inline"
+                          aria-hidden="true"
+                        />
+                        Verified
                       </span>
                     </div>
                     <p className="mt-1 text-[0.72rem] text-[#617968]">
                       Proprietor: {farmer.proprietor}
                     </p>
                     <p className="mt-1 text-[0.72rem] text-[#617968]">
-                      <span className="text-[#12642e]">⌖</span>{" "}
+                      <MapPin
+                        size={14}
+                        className="mr-1 inline text-[#12642e]"
+                        aria-hidden="true"
+                      />
                       {farmer.location}
                     </p>
                   </div>
@@ -523,7 +538,11 @@ function Market() {
 
                 <div className="mt-auto flex items-center justify-between border-t border-[#e1e9dd] pt-3">
                   <span className="text-[0.76rem] text-[#617968]">
-                    <strong className="text-[#fac449]">★</strong>{" "}
+                    <Star
+                      size={13}
+                      className="mr-1 inline fill-[#fac449] text-[#fac449]"
+                      aria-hidden="true"
+                    />
                     {farmer.rating} ({farmer.reviews})
                   </span>
                   <button
@@ -611,7 +630,12 @@ function Market() {
               />
               <div>
                 <span className="rounded-full bg-[#dff1df] px-2.5 py-1 text-xs font-bold text-[#12642e]">
-                  ✓ Verified Farmer
+                  <BadgeCheck
+                    size={14}
+                    className="mr-1 inline"
+                    aria-hidden="true"
+                  />
+                  Verified Farmer
                 </span>
                 <h2
                   id="farmer-profile-title"
@@ -644,7 +668,11 @@ function Market() {
             </div>
             <div className="mt-5 flex items-center justify-between text-sm text-[#617968]">
               <span>
-                <strong className="text-[#fac449]">★</strong>{" "}
+                <Star
+                  size={14}
+                  className="mr-1 inline fill-[#fac449] text-[#fac449]"
+                  aria-hidden="true"
+                />
                 {selectedFarmer.rating} ({selectedFarmer.reviews} reviews)
               </span>
               <span className="font-semibold">

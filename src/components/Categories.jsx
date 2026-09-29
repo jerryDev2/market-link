@@ -4,118 +4,100 @@ import { motion } from "framer-motion";
 
 const categories = [
   {
-    title: "Crop & Grain Farms",
+    title: "Crops & Grains",
     filter: "Grains",
-    badge: "Staple Harvest",
     image: "/images/Crop%20and%20Grain%20Farms/crop%20and%20grain.jfif",
-    description:
-      "Maize, wheat, rice, and sorghum grown for reliable food supply and daily nutrition.",
+    description: "Maize, rice, wheat and other staple farm produce.",
   },
   {
-    title: "Horticulture & Vegetable Farms",
+    title: "Fruits & Vegetables",
     filter: "Fruits",
-    badge: "Fresh Produce",
     image:
       "/images/Horticulture%20and%20Vegetable%20Farms/Horticulture%20and%20Vegetable%20Farms.jfif",
-    description:
-      "Fresh fruits, greens, and vegetables grown for taste, health, and local variety.",
+    description: "Fresh fruits, vegetables and greens from local farms.",
   },
   {
-    title: "Livestock & Dairy Farms",
+    title: "Livestock & Dairy",
     filter: "Livestock",
-    badge: "Healthy Living",
     image:
       "/images/Livestock%20and%20Dairy%20Farms/Livestock%20and%20Dairy%20Farms.jfif",
-    description:
-      "Milk, meat, and livestock products from farms focused on quality and care.",
+    description: "Quality meat, milk and other livestock products.",
   },
   {
-    title: "Poultry & Egg Farms",
+    title: "Poultry & Eggs",
     filter: "Poultry",
-    badge: "Protein Source",
     image:
       "/images/Poultry%20and%20Egg%20Farms/Poultry%20and%20Egg%20Farms.jfif",
-    description:
-      "Eggs and poultry raised with care for everyday nutrition and freshness.",
+    description: "Fresh eggs and poultry products from local farms.",
   },
 ];
 
 function Categories() {
-    return (
-    <section
-        id="categories"
-        className="relative overflow-hidden bg-[#F5F9F3] py-20"
-    >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mb-12 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-                <div className="max-w-xl">
-            <span className="inline-flex items-center rounded-full border border-[#CDE7D0] bg-white px-3 py-1 text-[11px] font-semibold tracking-[0.18em] text-[#1B5E20] uppercase shadow-sm">
-              Farm Categories
-            </span>
-                    <h2 className="mt-4 text-3xl font-black tracking-tight text-[#173E1A] sm:text-4xl">
-                        Find your favorite harvest
-                    </h2>
-                </div>
+  return (
+    <section id="categories" className="bg-[#F5F9F3] py-20">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Heading */}
+        <div className="mb-10">
+          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[#1B5E20]">
+            Farm Categories
+          </span>
 
-          <Link
-            to="/product"
-            className="inline-flex items-center gap-2 self-start rounded-full border border-[#1B5E20]/10 bg-white px-4 py-2.5 text-sm font-semibold text-[#1B5E20] shadow-sm transition hover:-translate-y-0.5 hover:border-[#1B5E20]/20 hover:shadow-md"
-          >
-            Browse all farms
-            <span aria-hidden="true">→</span>
-          </Link>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-[#173E1A] sm:text-4xl">
+            Shop by category
+          </h2>
+
+          <p className="mt-3 max-w-xl text-sm leading-6 text-[#4B5F52]">
+            Explore fresh produce and farm products from trusted local farmers.
+          </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-          {categories.map(
-            ({ title, badge, image, description, filter }, index) => (
-              <motion.article
-                key={title}
-                initial={{ opacity: 0, y: 18 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.15 }}
-                transition={{ duration: 0.35, delay: index * 0.06 }}
-                className="group overflow-hidden rounded-[28px] border border-[#E7F3E8] bg-white shadow-[0_18px_45px_rgba(27,94,32,0.08)] transition duration-300 hover:-translate-y-2 hover:shadow-[0_25px_60px_rgba(27,94,32,0.12)]"
-              >
-                <div className="relative h-64 overflow-hidden">
-                  <img
-                    src={image}
-                    alt={title}
-                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0C1E10]/75 via-[#0C1E10]/10 to-transparent" />
-                  <span className="absolute left-4 top-4 inline-flex rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#1B5E20] backdrop-blur-sm">
-                    {badge}
+        {/* Categories */}
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {categories.map(({ title, filter, image, description }, index) => (
+            <motion.article
+              key={title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{
+                duration: 0.4,
+                delay: index * 0.05,
+              }}
+              className="group overflow-hidden rounded-2xl border border-[#E2EEE3] bg-white transition hover:-translate-y-1 hover:shadow-lg"
+            >
+              {/* Image */}
+              <div className="h-52 overflow-hidden">
+                <img
+                  src={image}
+                  alt={title}
+                  className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                />
+              </div>
+
+              {/* Content */}
+              <div className="p-5">
+                <h3 className="text-lg font-bold text-[#173E1A]">{title}</h3>
+
+                <p className="mt-2 text-sm leading-6 text-[#5B6F61]">
+                  {description}
+                </p>
+
+                <Link
+                  to={`/product?category=${encodeURIComponent(filter)}`}
+                  className="mt-5 inline-flex items-center text-sm font-semibold text-[#1B5E20] transition hover:text-[#154a1a]"
+                >
+                  Shop category
+                  <span className="ml-2 transition-transform group-hover:translate-x-1">
+                    →
                   </span>
-                </div>
-
-                <div className="p-5">
-                  <h3 className="text-xl font-bold leading-tight text-[#173E1A]">
-                    {title}
-                  </h3>
-                  <p className="mt-3 text-sm leading-6 text-[#4B5F52]">
-                    {description}
-                  </p>
-
-                  <div className="mt-5 flex items-center justify-between">
-                    <Link
-                      to={`/product?category=${encodeURIComponent(filter)}`}
-                      className="rounded-full bg-[#1B5E20] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#154a1a]"
-                    >
-                      View
-                    </Link>
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EAF7EA] text-lg text-[#1B5E20]">
-                      →
-                    </span>
-                  </div>
-                </div>
-              </motion.article>
-            ),
-          )}
-          </div>
+                </Link>
+              </div>
+            </motion.article>
+          ))}
         </div>
+      </div>
     </section>
-    )
+  );
 }
 
 export default Categories;

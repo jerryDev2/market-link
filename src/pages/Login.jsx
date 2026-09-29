@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Check } from "lucide-react";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 const apiUrl = (path) => `${API_BASE_URL}${path}`;
@@ -108,7 +109,7 @@ function Login() {
     <div className="min-h-screen bg-[#FFFDF5] px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
       <div className="mx-auto max-w-6xl overflow-hidden rounded-[28px] border border-[#E8F5E9] bg-white shadow-[0_25px_80px_rgba(27,94,32,0.08)]">
         <div className="grid lg:grid-cols-[1.05fr_0.95fr]">
-          <section className="bg-[#A5D6A7] p-6 sm:p-8 lg:p-12">
+          <section className="bg-[#A5D6A7] p-6 sm:p-8 lg:p-12 hidden lg:block">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#1B5E20] text-lg font-bold text-white shadow-sm">
                 M
@@ -143,7 +144,7 @@ function Login() {
                   className="rounded-2xl border border-[#E8F5E9] bg-[#FFFDF5]/75 p-4 shadow-sm backdrop-blur-sm"
                 >
                   <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#F9C74F] text-lg text-[#263238]">
-                    ✓
+                    <Check size={18} aria-hidden="true" />
                   </div>
                   <h3 className="text-base font-semibold text-[#1B5E20]">
                     {item.title}
