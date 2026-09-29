@@ -14,7 +14,7 @@ const getStoredUser = () => {
   }
 };
 
-function Header() {
+function Header({ sticky = false, headerRef = null }) {
   const [currentUser, setCurrentUser] = useState(() => getStoredUser());
   const [cartCount, setCartCount] = useState(() =>
     Number(localStorage.getItem("cartCount") || 0),
@@ -163,14 +163,18 @@ function Header() {
   };
 
   return (
-    <motion.header className="relative z-50 bg-[#1B5E20]">
+    <motion.header
+      ref={headerRef}
+      initial={sticky ? { y: -100 } : false}
+      animate={{ y: 0 }}
+      exit={sticky ? { y: -100 } : undefined}
+      transition={{ duration: 0.25, ease: "easeOut" }}
+      className={`${sticky ? "fixed left-1/2 top-4 z-[100] w-[calc(100%-2rem)] max-w-6xl -translate-x-1/2 rounded-2xl shadow-lg" : "relative z-50"} bg-[#1B5E20]`}
+    >
       <motion.nav className="mx-auto flex h-[76px] max-w-6xl items-center justify-between px-5 sm:px-8 lg:px-10">
         {/* Logo */}
         <a href="/" className="flex items-center gap-2.5">
-          
-          <img src={logo} alt="" className="w-40"/>
-          
-
+          <img src={logo} alt="" className="w-40" />
         </a>
 
         {/* Navigation */}
@@ -182,34 +186,34 @@ function Header() {
             Home
           </NavLink>
 
-                    <NavLink
-                        to="/product"
-                        className="font-['Poppins'] text-sm font-medium! text-white/90 transition  hover:text-[#F9C74F] border-b-2 hover:border-[#F9C74F] p-2 border-transparent"
-                    >
-                        Products
-                    </NavLink>
+          <NavLink
+            to="/product"
+            className="font-['Poppins'] text-sm font-medium! text-white/90 transition  hover:text-[#F9C74F] border-b-2 hover:border-[#F9C74F] p-2 border-transparent"
+          >
+            Products
+          </NavLink>
 
-                    <NavLink
-                        to="/market"
-                        className="font-['Poppins'] text-sm font-medium text-white/90 transition  hover:text-[#F9C74F] border-b-2 hover:border-[#F9C74F] p-2 border-transparent"
-                    >
-                        Market
-                    </NavLink>
+          <NavLink
+            to="/market"
+            className="font-['Poppins'] text-sm font-medium text-white/90 transition  hover:text-[#F9C74F] border-b-2 hover:border-[#F9C74F] p-2 border-transparent"
+          >
+            Market
+          </NavLink>
 
-                    <NavLink
-                        to="/about-us"
-                        className="font-['Poppins'] text-sm font-medium text-white/90 transition  hover:text-[#F9C74F] border-b-2 hover:border-[#F9C74F] p-2 border-transparent"
-                    >
-                        About Us
-                    </NavLink>
+          <NavLink
+            to="/about-us"
+            className="font-['Poppins'] text-sm font-medium text-white/90 transition  hover:text-[#F9C74F] border-b-2 hover:border-[#F9C74F] p-2 border-transparent"
+          >
+            About Us
+          </NavLink>
 
-                    <NavLink
-                        to="/contact-us"
-                        className="font-['Poppins'] text-sm font-medium text-white/90 transition  hover:text-[#F9C74F] border-b-2 hover:border-[#F9C74F] p-2 border-transparent"
-                    >
-                        Contact Us
-                    </NavLink>
-                </div>
+          <NavLink
+            to="/contact-us"
+            className="font-['Poppins'] text-sm font-medium text-white/90 transition  hover:text-[#F9C74F] border-b-2 hover:border-[#F9C74F] p-2 border-transparent"
+          >
+            Contact Us
+          </NavLink>
+        </div>
 
         {/* Right side */}
         <div className="hidden items-center gap-7 xl:flex">
@@ -230,14 +234,14 @@ function Header() {
                 strokeLinejoin="round"
               />
 
-                            <circle cx="10" cy="20" r="1.2" fill="currentColor"/>
-                            <circle cx="18" cy="20" r="1.2" fill="currentColor"/>
-                        </svg>
+              <circle cx="10" cy="20" r="1.2" fill="currentColor" />
+              <circle cx="18" cy="20" r="1.2" fill="currentColor" />
+            </svg>
 
             <span className="absolute -right-2.5 -top-2 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-[#F9C74F] px-1 font-['Inter'] text-[9px] font-bold text-[#263238]">
               0
             </span>
-                    </button>
+          </button>
 
           <Link to="/login">
             <button

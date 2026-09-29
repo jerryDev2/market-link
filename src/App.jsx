@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import "./App.css";
 import { AnimatePresence, motion, MotionConfig } from "framer-motion";
 import {
@@ -55,13 +55,46 @@ function RequireAuth({ children, allowedRole }) {
 
 function AppLayout() {
   const location = useLocation();
+  const headerRef = useRef(null);
+  const [showStickyHeader, setShowStickyHeader] = useState(false);
   const hiddenLayoutRoutes = ["/farmer-dashboard", "/farmer-profile"];
 
   const shouldHideLayout = hiddenLayoutRoutes.includes(location.pathname);
 
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (shouldHideLayout) {
+      setShowStickyHeader(false);
+      return;
+    }
+
+    const trigger =
+      location.pathname === "/"
+        ? document.getElementById("home-hero")
+        : headerRef.current;
+    if (!trigger) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowStickyHeader(!entry.isIntersecting),
+      {
+        rootMargin: location.pathname === "/" ? "-76px 0px 0px 0px" : "0px",
+        threshold: 0,
+      },
+    );
+
+    observer.observe(trigger);
+    return () => observer.disconnect();
+  }, [location.pathname, shouldHideLayout]);
+
   return (
     <>
-      {!shouldHideLayout && <Header />}
+      {!shouldHideLayout && <Header headerRef={headerRef} />}
+      <AnimatePresence>
+        {showStickyHeader && <Header key="sticky-header" sticky />}
+      </AnimatePresence>
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={location.pathname}

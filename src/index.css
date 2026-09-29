@@ -2,73 +2,71 @@
 @import "tailwindcss";
 
 :root {
-    --color-pry: #1b5e20;
-    --color-sec: #a5d6a7;
-    --color-gold: #f9c74f;
-    --color-cream: #fffdf5;
-    --color-text: #263238;
-    --color-light-green: #a5d6a7;
-    --color-light-gray: #e8f5e9;
-    --color-border: #e8f5e9;
-    --color-success: #2e7d32;
+  --color-pry: #1b5e20;
+  --color-sec: #a5d6a7;
+  --color-gold: #f9c74f;
+  --color-cream: #fffdf5;
+  --color-text: #263238;
+  --color-light-green: #a5d6a7;
+  --color-light-gray: #e8f5e9;
+  --color-border: #e8f5e9;
+  --color-success: #2e7d32;
 }
 
 * {
+  button:hover {
+    cursor: pointer;
 
-
-    button:hover {
-        cursor: pointer;
-
-        .rightArrow {
-            transform: translateX(10px);
-            transition: 0.2s ease-in;
-        }
+    .rightArrow {
+      transform: translateX(10px);
+      transition: 0.2s ease-in;
     }
+  }
 
-    a:hover {
-        cursor: pointer;
+  a:hover {
+    cursor: pointer;
 
-        .rightArrow {
-            transform: translateX(10px);
-            transition: 0.2s ease-in;
-        }
+    .rightArrow {
+      transform: translateX(10px);
+      transition: 0.2s ease-in;
     }
-
-
+  }
 }
 
 body {
-    margin: 0;
-    background: var(--color-cream);
-    color: var(--color-text);
-    font-family: "Inter", sans-serif;
+  margin: 0;
+  background: var(--color-cream);
+  color: var(--color-text);
+  font-family: "Inter", sans-serif;
 }
 
 .brand-strip {
-    background: #c9a84c;
-    /* overflow: hidden; Tells the browser to cut off anything outside immediately */
-    padding: 0 70px;
-    white-space: nowrap;
-    overflow: hidden;
+  background: #c9a84c;
+  /* overflow: hidden; Tells the browser to cut off anything outside immediately */
+  padding: 0 70px;
+  white-space: nowrap;
+  overflow: hidden;
 
-    /* Add these to lock down the layout during load */
-    width: 100%;
-    max-width: 100vw;
-    /* contain: paint; Advanced CSS: Prevents child elements from affecting parent bounds */
+  /* Add these to lock down the layout during load */
+  width: 100%;
+  max-width: 100vw;
+  /* contain: paint; Advanced CSS: Prevents child elements from affecting parent bounds */
 }
 
 .strip-inner {
-    /*display: inline-block;*/
-    animation: strip 20s linear infinite;
-    font-size: 16px;
-    letter-spacing: 2px;
+  display: flex;
+  width: max-content;
+  animation: strip 20s linear infinite;
+  font-size: 16px;
+  letter-spacing: 2px;
+  will-change: transform;
 }
 
 @keyframes strip {
-    0% {
-        transform: translateX(0);
-    }
-    100% {
-        transform: translateX(-50%);
-    }
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }

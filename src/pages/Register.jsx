@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Check, ChevronDown } from "lucide-react";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 const apiUrl = (path) => `${API_BASE_URL}${path}`;
@@ -55,7 +56,20 @@ function Register() {
   const [passwordError, setPasswordError] = useState("");
   const [notice, setNotice] = useState({ type: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [roleOptionsOpen, setRoleOptionsOpen] = useState(false);
+  const roleMenuRef = useRef(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const closeRoleOptions = (event) => {
+      if (roleMenuRef.current && !roleMenuRef.current.contains(event.target)) {
+        setRoleOptionsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", closeRoleOptions);
+    return () => document.removeEventListener("mousedown", closeRoleOptions);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -334,16 +348,62 @@ function Register() {
                 >
                   I am joining as
                 </label>
-                <select
-                  value={formData.role}
-                  name="role"
-                  onChange={handleChange}
-                  id="role"
-                  className="w-full rounded-xl border border-[#E8F5E9] bg-white px-4 py-3 text-base text-[#263238] focus:border-[#2E7D32] focus:outline-none focus:ring-2 focus:ring-[#2E7D32]/20"
-                >
-                  <option value="CUSTOMER">Customer</option>
-                  <option value="FARMER">Farmer</option>
-                </select>
+                <div ref={roleMenuRef} className="relative">
+                  <button
+                    type="button"
+                    id="role"
+                    aria-haspopup="listbox"
+                    aria-expanded={roleOptionsOpen}
+                    onClick={() => setRoleOptionsOpen((open) => !open)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Escape") setRoleOptionsOpen(false);
+                    }}
+                    className="flex w-full cursor-pointer items-center justify-between gap-4 rounded-xl border border-[#E8F5E9] bg-white px-4 py-3 text-left font-[Poppins] text-sm font-semibold text-[#1B5E20] shadow-[0_5px_18px_rgba(27,94,32,0.06)] outline-none transition hover:border-[#2E7D32] focus:border-[#2E7D32] focus:ring-4 focus:ring-[#E8F5E9]"
+                  >
+                    {formData.role === "CUSTOMER" ? "Customer" : "Farmer"}
+                    <ChevronDown
+                      size={17}
+                      aria-hidden="true"
+                      className={`text-[#2E7D32] transition-transform ${roleOptionsOpen ? "rotate-180" : ""}`}
+                    />
+                  </button>
+                  {roleOptionsOpen && (
+                    <div
+                      role="listbox"
+                      aria-labelledby="role"
+                      className="absolute left-0 right-0 z-20 mt-2 overflow-hidden rounded-xl border border-[#E8F5E9] bg-white p-1.5 shadow-[0_14px_30px_rgba(27,94,32,0.14)]"
+                    >
+                      {[
+                        ["CUSTOMER", "Customer"],
+                        ["FARMER", "Farmer"],
+                      ].map(([value, label]) => (
+                        <button
+                          key={value}
+                          type="button"
+                          role="option"
+                          aria-selected={formData.role === value}
+                          onClick={() => {
+                            setFormData((current) => ({
+                              ...current,
+                              role: value,
+                            }));
+                            setRoleOptionsOpen(false);
+                          }}
+                          className={`flex w-full cursor-pointer items-center justify-between rounded-lg px-3 py-2.5 text-left font-[Poppins] text-sm transition ${formData.role === value ? "bg-[#E8F5E9] font-bold text-[#1B5E20]" : "text-[#263238] hover:bg-[#FFFDF5]"}`}
+                        >
+                          {label}
+                          {formData.role === value && (
+                            <Check
+                              size={15}
+                              aria-hidden="true"
+                              className="text-[#2E7D32]"
+                            />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div>

@@ -19,10 +19,10 @@ function ContactUs() {
               <span className="h-2 w-2 rounded-full bg-[#f9c74f]" /> We are here
               for you
             </p>
-            <h1 className="max-w-[650px] font-[Poppins] text-4xl font-bold leading-[1.08] text-[#1b5e20] sm:text-5xl lg:text-6xl">
+            <h1 className="max-w-162.5 font-[Poppins] text-4xl font-bold leading-[1.08] text-[#1b5e20] sm:text-5xl lg:text-6xl">
               Let&apos;s make fresh happen.
             </h1>
-            <p className="mt-5 max-w-[530px] text-base leading-7 text-[#47604d] sm:text-lg">
+            <p className="mt-5 max-w-132.5 text-base leading-7 text-[#47604d] sm:text-lg">
               Questions, ideas, or a little help with your order? Drop us a line
               and our team will get back to you soon.
             </p>    
