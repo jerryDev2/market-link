@@ -186,7 +186,7 @@ function HowToUseMarketLink() {
 
 
                         to="/market"
-                        className="animate-pulse hover:animate-none cursor-pointer group flex shrink-0 items-center gap-2 rounded-lg bg-[#F9C74F] px-5 py-3 font-['Poppins'] text-sm font-semibold text-[#263238] transition duration-300 hover:-translate-y-0.5 hover:bg-[#FFD66B]"
+                        className="animate-pulse z-50 hover:animate-none cursor-pointer group flex shrink-0 items-center gap-2 rounded-lg bg-[#F9C74F] px-5 py-3 font-['Poppins'] text-sm font-semibold text-[#263238] transition duration-300 hover:-translate-y-0.5 hover:bg-[#FFD66B]"
                     >
                         Explore Markets
                         <span className="transition-transform  rightArrow duration-300 group-hover:translate-x-1">

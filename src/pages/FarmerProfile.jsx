@@ -33,51 +33,6 @@ const getDisplayName = (user) => {
 };
 
 function FarmerProfile() {
-  const user = getStoredUser();
-  const displayName = getDisplayName(user);
-  const profileDetails = [
-    {
-      label: "Stall / Business name",
-      value:
-        user?.farmName ||
-        user?.businessName ||
-        user?.stallName ||
-        "MarketLink Farm",
-    },
-    {
-      label: "Contact information",
-      value: `${user?.phoneNumber || user?.phone || "+233 000 000 000"} · ${user?.email || "farmer@marketlink.com"}`,
-    },
-    {
-      label: "Address",
-      value:
-        user?.address ||
-        user?.farmAddress ||
-        "No. 12 Farm Lane, Ashaiman, Greater Accra",
-    },
-    {
-      label: "Market location",
-      value: user?.marketLocation || "Agbogba Farmers Market · Stall A-07",
-    },
-    {
-      label: "Operating days",
-      value: user?.operatingDays || "Monday - Saturday",
-    },
-    {
-      label: "Pickup time windows",
-      value:
-        user?.pickupTimeWindows || "7:00 AM - 11:00 AM · 3:00 PM - 6:00 PM",
-    },
-  ];
-
-  const operatingDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-  const pickupWindows = [
-    "7:00 AM - 9:00 AM",
-    "10:00 AM - 12:00 PM",
-    "3:00 PM - 5:00 PM",
-  ];
-
   return (
     <div className="min-h-screen bg-[#FFFDF5] px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
       <div className="mx-auto max-w-7xl">
@@ -207,4 +162,4 @@ function FarmerProfile() {
   );
 }
 
-export default FarmerProfile;
+export default FarmerProfile

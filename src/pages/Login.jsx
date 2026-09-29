@@ -27,84 +27,6 @@ const marketHighlights = [
 ];
 
 function Login() {
-  const [formData, setFormData] = useState({ email: "", password: "" });
-  const [loading, setLoading] = useState(false);
-  const [notice, setNotice] = useState({ type: "", message: "" });
-  const navigate = useNavigate();
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-
-    if (notice.message) {
-      setNotice({ type: "", message: "" });
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const { email, password } = formData;
-
-    if (!email.trim() || !password) {
-      setNotice({
-        type: "error",
-        message: "Please enter your email and password.",
-      });
-      return;
-    }
-
-    setLoading(true);
-    setNotice({ type: "", message: "" });
-
-    try {
-      const response = await fetch(apiUrl("/api/login"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json().catch(() => ({}));
-      console.log("LOGIN RESPONSE:", data);
-      console.log("LOGIN USER:", data.user);
-      console.log("LOGIN ROLE:", data.user?.role);
-      console.log("LOGIN TOKEN:", data.token);
-
-      if (!response.ok) {
-        console.log("LOGIN BACKEND RESPONSE:", data);
-        throw new Error(
-          data.message || data.error || "Invalid email or password.",
-        );
-      }
-
-      if (!data.user) {
-        throw new Error("No user returned from the server.");
-      }
-
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-
-      const userRole = data.user?.role?.toUpperCase();
-
-      if (userRole === "CUSTOMER") {
-        window.location.href = "/";
-      } else if (userRole === "FARMER") {
-        window.location.href = "/farmer-dashboard";
-      } else {
-        window.location.href = "/";
-      }
-    } catch (error) {
-      console.error("login error:", error);
-
-      setNotice({
-        type: "error",
-        message: error.message || "Something went wrong during login.",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-[#FFFDF5] px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
       <div className="mx-auto max-w-6xl overflow-hidden rounded-[28px] border border-[#E8F5E9] bg-white shadow-[0_25px_80px_rgba(27,94,32,0.08)]">
@@ -268,4 +190,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Login

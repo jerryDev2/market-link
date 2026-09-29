@@ -188,20 +188,6 @@ const getCategoryHref = (category) => {
 };
 
 function Market() {
-  const [showMoreCategories, setShowMoreCategories] = useState(false);
-  const [selectedFarmer, setSelectedFarmer] = useState(null);
-
-  useEffect(() => {
-    const exploreSection = document.getElementById("explore-fresh-harvests");
-
-    if (exploreSection) {
-      window.scrollTo({
-        top: Math.max(exploreSection.offsetTop - 88, 0),
-        behavior: "auto",
-      });
-    }
-  }, []);
-
   return (
     <main className="min-h-screen bg-[#dfe8d5] text-[#193d2c]">
       <section className="mx-auto max-w-[1500px] px-5 pb-16 pt-10 lg:px-8 xl:px-12">
@@ -686,4 +672,4 @@ function Market() {
   );
 }
 
-export default Market;
+export default Market
