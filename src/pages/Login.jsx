@@ -109,7 +109,7 @@ function Login() {
     <div className="min-h-screen bg-[#FFFDF5] px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
       <div className="mx-auto max-w-6xl overflow-hidden rounded-[28px] border border-[#E8F5E9] bg-white shadow-[0_25px_80px_rgba(27,94,32,0.08)]">
         <div className="grid lg:grid-cols-[1.05fr_0.95fr]">
-          <section className="bg-[#A5D6A7] p-6 sm:p-8 lg:p-12">
+          <section className="bg-[#A5D6A7] p-6 sm:p-8 lg:p-12 hidden lg:block">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#1B5E20] text-lg font-bold text-white shadow-sm">
                 M

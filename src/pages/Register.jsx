@@ -105,15 +105,22 @@ function Register() {
     }
 
     const passwordValidationMessage = validatePassword(password);
+
     if (passwordValidationMessage) {
       setPasswordError(passwordValidationMessage);
-      setNotice({ type: "error", message: passwordValidationMessage });
+      setNotice({
+        type: "error",
+        message: passwordValidationMessage,
+      });
       return;
     }
 
     if (password !== confirmPassword) {
       setPasswordError("Your password does not match.");
-      setNotice({ type: "error", message: "Your password does not match." });
+      setNotice({
+        type: "error",
+        message: "Your password does not match.",
+      });
       return;
     }
 
@@ -122,53 +129,44 @@ function Register() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(apiUrl("/api/user"), {
+      const response = await fetch(`${API_BASE_URL}/api/signup`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          email: email.trim().toLowerCase(),
+          phoneNumber: phoneNumber.trim(),
+          role,
+          password,
+        }),
       });
 
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error("Something went wrong. Please try again.");
+        throw new Error(
+          data.message ||
+            data.error ||
+            "Unable to create your account. Please try again.",
+        );
       }
 
-      if (!data?.user) {
-        throw new Error("No user was returned from the server.");
-      }
-
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      window.dispatchEvent(new Event("auth-change"));
-
-      setFormData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        phoneNumber: "",
-        role: "CUSTOMER",
-        password: "",
-        confirmPassword: "",
+      // Use the email from the form instead of depending
+      // on the backend returning data.email.
+      navigate("/verify-email", {
+        state: {
+          email: email.trim().toLowerCase(),
+        },
       });
-
-      const userRole = data.user?.role?.toUpperCase();
-
-      setNotice({
-        type: "success",
-        message: "Account created successfully! Redirecting...",
-      });
-
-      if (userRole === "CUSTOMER") {
-        navigate("/");
-      } else if (userRole === "FARMER") {
-        navigate("/farmer-dashboard");
-      }
     } catch (error) {
-      console.error("signup error:", error);
+      console.error("Signup error:", error);
+
       setNotice({
         type: "error",
-        message: error.message || "Something went wrong during signup.",
+        message: error.message || "Something went wrong during registration.",
       });
     } finally {
       setIsSubmitting(false);
@@ -176,9 +174,9 @@ function Register() {
   };
   return (
     <div className="min-h-screen bg-[#FFFDF5] px-4 py-6 sm:px-6 lg:px-8 lg:py-10 ">
-      <div className="mx-auto max-w-6xl overflow-hidden rounded-[28px] border border-[#E8F5E9] bg-white shadow-[0_25px_80px_rgba(27,94,32,0.08)]">
+      <div className="mx-auto max-w-6xl  overflow-hidden rounded-[28px] border border-[#E8F5E9] bg-white shadow-[0_25px_80px_rgba(27,94,32,0.08)]">
         <div className="grid lg:grid-cols-[1.05fr_0.95fr]">
-          <section className="bg-[#A5D6A7] p-6 sm:p-8 lg:p-12">
+          <section className="bg-[#A5D6A7] p-6 sm:p-8 lg:p-12 lg:block hidden">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#1B5E20] text-lg font-bold text-white shadow-sm">
                 M
@@ -433,3 +431,4 @@ function Register() {
 }
 
 export default Register;
+
