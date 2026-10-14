@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Toaster, toast } from "sonner";
-import { Hand, RefreshCw } from "lucide-react";
+import { Check, Hand, RefreshCw, X } from "lucide-react";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_URL ||
@@ -44,6 +44,7 @@ const orderStatuses = [
   "Accepted",
   "Ready for Pickup",
   "Completed",
+  "Declined",
   "Cancelled",
 ];
 
@@ -235,6 +236,10 @@ function FarmerDashboard() {
 
   const [ordersLoading, setOrdersLoading] = useState(false);
 
+  const [updatingOrderId, setUpdatingOrderId] = useState(null);
+
+  const [updatingOrderStatus, setUpdatingOrderStatus] = useState("");
+
   const [ordersError, setOrdersError] = useState("");
 
   const [activeOrderStatus, setActiveOrderStatus] = useState("All");
@@ -295,13 +300,11 @@ function FarmerDashboard() {
 
       if (!token) {
         console.warn("No JWT token found.");
-
         return null;
       }
 
       const response = await fetch(apiUrl("/api/farmer-profile/me"), {
         method: "GET",
-
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -312,9 +315,7 @@ function FarmerDashboard() {
 
         localStorage.removeItem("token");
         localStorage.removeItem("user");
-
         window.dispatchEvent(new Event("auth-change"));
-
         navigate("/");
 
         return null;
@@ -322,15 +323,14 @@ function FarmerDashboard() {
 
       if (!response.ok) {
         const errorText = await response.text();
-
         console.error("Farmer profile error:", errorText);
-
         throw new Error("Failed to fetch farmer profile");
       }
 
+      // Read the response body only once
       const data = await response.json();
 
-      console.log("Raw farmer profile:", data);
+      console.log("Full farmer profile API response:", data);
 
       const normalized = normalizeFarmerProfile(data);
 
@@ -339,23 +339,19 @@ function FarmerDashboard() {
       if (normalized?.firstName || normalized?.lastName) {
         const updatedUser = {
           ...user,
-
           firstName: normalized.firstName || getFirstName(user),
-
           lastName: normalized.lastName || getLastName(user),
-
           profileImage: normalized.profileImage || user?.profileImage || "",
+          farmerId: normalized.farmerId,
         };
 
         localStorage.setItem("user", JSON.stringify(updatedUser));
-
         setStoredUser(updatedUser);
       }
 
       return normalized;
     } catch (error) {
       console.error("Error fetching farmer profile:", error);
-
       return null;
     }
   };
@@ -431,56 +427,62 @@ function FarmerDashboard() {
     }
   };
 
-  const loadOrders = useCallback(async () => {
-    const token = localStorage.getItem("token");
-    const farmerId = getFarmerId(user);
+  const loadOrders = useCallback(
+    async (profile = farmerProfile) => {
+      const token = localStorage.getItem("token");
 
-    console.log("Stored user:", user);
-    console.log("Farmer profile:", farmerProfile);
-    console.log("Farmer ID used for orders:", farmerId);
-    console.log("Orders API URL:", apiUrl(`/api/orders/farmer/${farmerId}`));
+      const farmerId = getFarmerId(profile, user);
 
-    if (!token || !farmerId) {
-      setOrders([]);
-      setOrdersError(
-        "Farmer account details are missing. Please sign in again.",
-      );
-      return;
-    }
+      console.log("Farmer profile:", profile);
+      console.log("Farmer ID used for orders:", farmerId);
 
-    try {
-      setOrdersLoading(true);
-      setOrdersError("");
-
-      const response = await fetch(apiUrl(`/api/orders/farmer/${farmerId}`), {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Unable to load orders (${response.status})`);
+      if (!token || !farmerId) {
+        setOrders([]);
+        setOrdersError("Farmer ID is missing. Please reload your dashboard.");
+        return;
       }
 
-      const payload = await response.json();
-      const orderList = Array.isArray(payload)
-        ? payload
-        : payload.orders ||
-          payload.data?.orders ||
-          payload.content ||
-          payload.data?.content ||
-          payload.results ||
-          payload.data?.results ||
-          payload.data ||
-          [];
+      try {
+        setOrdersLoading(true);
+        setOrdersError("");
 
-      setOrders(Array.isArray(orderList) ? orderList : []);
-    } catch (error) {
-      console.error("Farmer order loading error:", error);
-      setOrders([]);
-      setOrdersError(error.message || "Unable to load customer orders.");
-    } finally {
-      setOrdersLoading(false);
-    }
-  }, [user]);
+        const response = await fetch(apiUrl(`/api/orders/farmer/${farmerId}`), {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log("Orders response status:", response.status);
+        console.log("Orders request URL:", response.url);
+
+        if (!response.ok) {
+          throw new Error(`Unable to load orders (${response.status})`);
+        }
+
+        const payload = await response.json();
+        console.log("Orders returned by backend:", payload);
+
+        const orderList = Array.isArray(payload)
+          ? payload
+          : payload.orders ||
+            payload.data?.orders ||
+            payload.content ||
+            payload.data?.content ||
+            payload.results ||
+            payload.data?.results ||
+            payload.data ||
+            [];
+
+        setOrders(Array.isArray(orderList) ? orderList : []);
+      } catch (error) {
+        console.error("Farmer order loading error:", error);
+        setOrders([]);
+        setOrdersError(error.message || "Unable to load customer orders.");
+      } finally {
+        setOrdersLoading(false);
+      }
+    },
+    [user, farmerProfile],
+  );
 
   useEffect(() => {
     loadProducts();
@@ -492,15 +494,63 @@ function FarmerDashboard() {
 
     initializeDashboard();
   }, []);
-  useEffect(() => {
-    if (activeTab !== "Orders") return undefined;
+  const handleOrderDecision = async (order, status) => {
+    const orderId = order.orderId || order.id;
+    const token = localStorage.getItem("token");
 
-    const intervalId = window.setInterval(() => {
-      loadOrders();
-    }, 15000);
+    if (!orderId || !token) {
+      toast.error("Unable to update this order. Please sign in again.");
+      return;
+    }
 
-    return () => window.clearInterval(intervalId);
-  }, [activeTab, loadOrders]);
+    try {
+      setUpdatingOrderId(orderId);
+      setUpdatingOrderStatus(status);
+
+      const response = await fetch(
+        apiUrl(
+          `/api/orders/${orderId}/status?status=${encodeURIComponent(status)}`,
+        ),
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const payload = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(
+          payload.message || payload.error || "Unable to update this order.",
+        );
+      }
+
+      const updatedOrder = payload.order || payload.data || payload;
+      setOrders((currentOrders) =>
+        currentOrders.map((currentOrder) =>
+          String(currentOrder.orderId || currentOrder.id) === String(orderId)
+            ? {
+                ...currentOrder,
+                ...updatedOrder,
+                status: updatedOrder.status || status,
+              }
+            : currentOrder,
+        ),
+      );
+      toast.success(
+        status === "READY_FOR_PICKUP"
+          ? "Order ready for pickup."
+          : "Order declined.",
+      );
+    } catch (error) {
+      toast.error(error.message || "Unable to update this order.");
+    } finally {
+      setUpdatingOrderId(null);
+      setUpdatingOrderStatus("");
+    }
+  };
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -1207,7 +1257,7 @@ function FarmerDashboard() {
           <h2 className="text-3xl font-bold text-[#173E1A]">Customer Orders</h2>
           <button
             type="button"
-            onClick={loadOrders}
+            onClick={() => loadOrders()}
             disabled={ordersLoading}
             aria-label="Refresh orders"
             title="Refresh orders"
@@ -1258,6 +1308,10 @@ function FarmerDashboard() {
         ) : (
           <div className="space-y-4">
             {filteredOrders.map((order, index) => {
+              const orderId = order.orderId || order.id;
+              const isPending =
+                String(order.status || "PENDING").toUpperCase() === "PENDING";
+              const isUpdating = String(updatingOrderId) === String(orderId);
               const customer = order.customer || order.user || {};
               const customerName =
                 order.customerName ||
@@ -1322,6 +1376,35 @@ function FarmerDashboard() {
                       ).toLocaleString("en-NG")}
                     </span>
                   </div>
+                  {isPending && (
+                    <div className="mt-4 flex flex-wrap justify-end gap-2 border-t border-[#EDF4EE] pt-3">
+                      <button
+                        type="button"
+                        onClick={() => handleOrderDecision(order, "DECLINED")}
+                        disabled={updatingOrderId !== null}
+                        className="inline-flex items-center gap-2 rounded-lg border border-red-200 px-3 py-2 text-sm font-semibold text-red-700 disabled:opacity-50"
+                      >
+                        <X size={16} />
+                        {isUpdating && updatingOrderStatus === "DECLINED"
+                          ? "Updating..."
+                          : "Decline"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleOrderDecision(order, "READY_FOR_PICKUP")
+                        }
+                        disabled={updatingOrderId !== null}
+                        className="inline-flex items-center gap-2 rounded-lg bg-[#1B5E20] px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                      >
+                        <Check size={16} />
+                        {isUpdating &&
+                        updatingOrderStatus === "READY_FOR_PICKUP"
+                          ? "Updating..."
+                          : "Accept"}
+                      </button>
+                    </div>
+                  )}
                 </article>
               );
             })}

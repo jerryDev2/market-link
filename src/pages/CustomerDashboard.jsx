@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+
 import {
   ShoppingBag,
   Package,
@@ -60,6 +61,7 @@ const getStatusClass = (status) => {
       return "bg-yellow-100 text-yellow-700";
 
     case "ACCEPTED":
+    case "READY_FOR_PICKUP":
       return "bg-green-100 text-green-700";
 
     case "PROCESSING":
@@ -126,66 +128,56 @@ function CustomerDashboard() {
 
   const user = getStoredUser();
 
-  const token = localStorage.getItem("token");
-
   const userId = getUserId(user);
 
   /* --------------------------------------------------
-     LOAD FARMER ORDERS
+     LOAD CUSTOMER ORDERS
   -------------------------------------------------- */
 
-  const loadOrders = useCallback(
-    async (profileOverride = null) => {
-      const token = localStorage.getItem("token");
+  const loadOrders = useCallback(async () => {
+    const authToken = localStorage.getItem("token");
 
-      const farmerId =
-        getFarmerId(profileOverride, user) ?? getFarmerId(farmerProfile, user);
+    if (!authToken || !userId) {
+      setOrders([]);
+      setError("Unable to identify your account. Please sign in again.");
+      setLoadingOrders(false);
+      return;
+    }
 
-      if (!token || !farmerId) {
-        setOrders([]);
-        setOrdersError(
-          "Farmer ID is missing. Please check your farmer profile.",
-        );
-        return;
+    try {
+      setLoadingOrders(true);
+      setError("");
+
+      const response = await fetch(apiUrl(`/api/orders/user/${userId}`), {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Unable to load orders (${response.status})`);
       }
 
-      try {
-        setOrdersLoading(true);
-        setOrdersError("");
+      const payload = await response.json();
+      const orderList = Array.isArray(payload)
+        ? payload
+        : (payload.orders ??
+          payload.data?.orders ??
+          payload.content ??
+          payload.data?.content ??
+          payload.results ??
+          payload.data?.results ??
+          payload.data ??
+          []);
 
-        const response = await fetch(apiUrl(`/api/orders/farmer/${farmerId}`), {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`Unable to load orders (${response.status})`);
-        }
-
-        const payload = await response.json();
-
-        const orderList = Array.isArray(payload)
-          ? payload
-          : (payload.orders ??
-            payload.data?.orders ??
-            payload.content ??
-            payload.data?.content ??
-            payload.results ??
-            payload.data?.results ??
-            payload.data ??
-            []);
-
-        setOrders(Array.isArray(orderList) ? orderList : []);
-      } catch (error) {
-        console.error("Farmer order loading error:", error);
-        setOrdersError(error.message || "Unable to load customer orders.");
-      } finally {
-        setOrdersLoading(false);
-      }
-    },
-    [user, farmerProfile],
-  );
+      setOrders(Array.isArray(orderList) ? orderList : []);
+    } catch (error) {
+      console.error("Customer order loading error:", error);
+      setError(error.message || "Unable to load your orders.");
+    } finally {
+      setLoadingOrders(false);
+    }
+  }, [userId]);
 
   /* --------------------------------------------------
      LOAD ORDERS WHEN DASHBOARD OPENS
@@ -193,7 +185,7 @@ function CustomerDashboard() {
 
   useEffect(() => {
     loadOrders();
-  }, [userId, token]);
+  }, [loadOrders]);
 
   /* --------------------------------------------------
      CALCULATE ORDER GROUPS
@@ -468,16 +460,33 @@ function CustomerDashboard() {
   const renderHistory = () => {
     return (
       <div className="space-y-5">
-        <div>
-          <h2 className="text-3xl font-bold text-[#173E1A]">Order History</h2>
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h2 className="text-3xl font-bold text-[#173E1A]">Order History</h2>
 
-          <p className="mt-1 text-sm text-[#4A5E4F]">
-            Completed, cancelled and declined orders.
-          </p>
+            <p className="mt-1 text-sm text-[#4A5E4F]">
+              Completed, cancelled and declined orders.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={loadOrders}
+            disabled={loadingOrders}
+            className="inline-flex items-center gap-2 rounded-xl border border-[#1B5E20] bg-white px-4 py-2.5 text-sm font-semibold text-[#1B5E20] disabled:opacity-50"
+          >
+            <RefreshCw
+              size={16}
+              className={loadingOrders ? "animate-spin" : ""}
+            />
+            Refresh
+          </button>
         </div>
 
         {loadingOrders ? (
           <Loading />
+        ) : error ? (
+          <ErrorBox message={error} retry={loadOrders} />
         ) : orderHistory.length === 0 ? (
           <EmptyState message="No order history yet." />
         ) : (

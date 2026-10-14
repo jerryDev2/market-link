@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, Plus, Minus } from "lucide-react";
+import { ShoppingCart, Plus, Minus, Check } from "lucide-react";
 import { toast } from "sonner";
 
 const API_BASE_URL =
@@ -38,6 +38,7 @@ function ProductItem({
 
   const [cartQuantity, setCartQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
+  const [isAdded, setIsAdded] = useState(false);
 
   /*
    * Cloudinary image
@@ -51,12 +52,14 @@ function ProductItem({
   const stock = Number(stockQuantity ?? 0);
 
   const increaseQuantity = () => {
+    setIsAdded(false);
     setCartQuantity((current) =>
       stock > 0 ? Math.min(current + 1, stock) : current + 1,
     );
   };
 
   const decreaseQuantity = () => {
+    setIsAdded(false);
     setCartQuantity((current) => Math.max(1, current - 1));
   };
 
@@ -113,6 +116,7 @@ function ProductItem({
       localStorage.setItem("cartCount", String(oldCount + cartQuantity));
 
       window.dispatchEvent(new Event("cart-updated"));
+      setIsAdded(true);
 
       toast.success(
         `${cartQuantity} ${name} ${
@@ -236,13 +240,18 @@ function ProductItem({
           <button
             type="button"
             onClick={handleAddToCart}
-            disabled={isAdding || stock <= 0}
+            disabled={isAdding || isAdded || stock <= 0}
             className="flex h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-(--color-pry) px-3 text-sm font-bold text-white transition hover:bg-(--color-success) disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isAdding ? (
               <>
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                 Adding
+              </>
+            ) : isAdded ? (
+              <>
+                <Check size={17} />
+                Added
               </>
             ) : (
               <>

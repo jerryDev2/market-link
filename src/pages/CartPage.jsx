@@ -278,6 +278,60 @@ function CartPage() {
         payload.order?.orderId ||
         payload.order?.id;
 
+      const cartItemIds = items.map((item) => item.id).filter(Boolean);
+
+      try {
+        const cartResponse = await fetch(apiUrl(`/api/cart/user/${userId}`), {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (cartResponse.ok) {
+          const cartPayload = await cartResponse.json();
+          const remainingItems =
+            [
+              cartPayload,
+              cartPayload.items,
+              cartPayload.data,
+              cartPayload.data?.items,
+              cartPayload.cart,
+              cartPayload.cart?.items,
+            ].find(Array.isArray) || [];
+
+          cartItemIds.push(
+            ...remainingItems
+              .map((item) => item.cartItemId || item.id)
+              .filter(Boolean),
+          );
+        }
+      } catch (error) {
+        console.error("Unable to reload cart before clearing it:", error);
+      }
+
+      const cartCleanupResults = await Promise.allSettled(
+        [...new Set(cartItemIds)].map(async (cartItemId) => {
+          const deleteResponse = await fetch(
+            apiUrl(`/api/cart/${encodeURIComponent(cartItemId)}`),
+            {
+              method: "DELETE",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            },
+          );
+
+          if (!deleteResponse.ok && deleteResponse.status !== 404) {
+            throw new Error(`Unable to delete cart item ${cartItemId}`);
+          }
+        }),
+      );
+      const cartCleanupFailed = cartCleanupResults.some(
+        (result) => result.status === "rejected",
+      );
+
       localStorage.setItem("last-order", JSON.stringify(payload));
 
       localStorage.setItem("cartCount", "0");
@@ -294,9 +348,15 @@ function CartPage() {
         navigate("/customer-dashboard");
       }
 
-      toast.success(
-        "Order placed successfully. Your farmer will review it soon.",
-      );
+      if (cartCleanupFailed) {
+        toast.error(
+          "Order placed, but your saved cart could not be fully cleared. Please refresh your cart.",
+        );
+      } else {
+        toast.success(
+          "Order placed and cart cleared. Your farmer will review it soon.",
+        );
+      }
     } catch (error) {
       console.error("Checkout error:", error);
 
