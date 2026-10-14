@@ -435,6 +435,11 @@ function FarmerDashboard() {
     const token = localStorage.getItem("token");
     const farmerId = getFarmerId(user);
 
+    console.log("Stored user:", user);
+    console.log("Farmer profile:", farmerProfile);
+    console.log("Farmer ID used for orders:", farmerId);
+    console.log("Orders API URL:", apiUrl(`/api/orders/farmer/${farmerId}`));
+
     if (!token || !farmerId) {
       setOrders([]);
       setOrdersError(
