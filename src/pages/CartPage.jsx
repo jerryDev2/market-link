@@ -13,7 +13,9 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://marketlink-backend-abpl.onrender.com";
 
 const apiUrl = (path) => `${API_BASE_URL}${path}`;
 
@@ -223,88 +225,88 @@ function CartPage() {
     }
   };
 
- const handleCheckoutSubmit = async (event) => {
-   event.preventDefault();
+  const handleCheckoutSubmit = async (event) => {
+    event.preventDefault();
 
-   if (!token || !userId) {
-     navigate("/login");
-     return;
-   }
+    if (!token || !userId) {
+      navigate("/login");
+      return;
+    }
 
-   if (
-     !checkoutForm.name.trim() ||
-     !checkoutForm.phone.trim() ||
-     !checkoutForm.address.trim()
-   ) {
-     toast.error("Please complete your delivery details to continue.");
-     return;
-   }
+    if (
+      !checkoutForm.name.trim() ||
+      !checkoutForm.phone.trim() ||
+      !checkoutForm.address.trim()
+    ) {
+      toast.error("Please complete your delivery details to continue.");
+      return;
+    }
 
-   if (items.length === 0) {
-     toast.error("Your cart is empty.");
-     return;
-   }
+    if (items.length === 0) {
+      toast.error("Your cart is empty.");
+      return;
+    }
 
-   try {
-     setIsSubmitting(true);
+    try {
+      setIsSubmitting(true);
 
-     const response = await fetch(apiUrl("/api/orders"), {
-       method: "POST",
-       headers: {
-         Authorization: `Bearer ${token}`,
-         "Content-Type": "application/json",
-       },
-       body: JSON.stringify({
-         userId: userId,
-         pickupPlace: checkoutForm.address,
-       }),
-     });
+      const response = await fetch(apiUrl("/api/orders"), {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: userId,
+          pickupPlace: checkoutForm.address,
+        }),
+      });
 
-     const payload = await response.json().catch(() => ({}));
+      const payload = await response.json().catch(() => ({}));
 
-     if (!response.ok) {
-       throw new Error(
-         payload.message || payload.error || "Unable to place order",
-       );
-     }
+      if (!response.ok) {
+        throw new Error(
+          payload.message || payload.error || "Unable to place order",
+        );
+      }
 
-     console.log("Order created:", payload);
+      console.log("Order created:", payload);
 
-     const orderId =
-       payload.orderId ||
-       payload.id ||
-       payload.order?.orderId ||
-       payload.order?.id;
+      const orderId =
+        payload.orderId ||
+        payload.id ||
+        payload.order?.orderId ||
+        payload.order?.id;
 
-     localStorage.setItem("last-order", JSON.stringify(payload));
+      localStorage.setItem("last-order", JSON.stringify(payload));
 
-     localStorage.setItem("cartCount", "0");
+      localStorage.setItem("cartCount", "0");
 
-     setItems([]);
+      setItems([]);
 
-     setCheckoutOpen(false);
+      setCheckoutOpen(false);
 
-     window.dispatchEvent(new Event("cart-updated"));
+      window.dispatchEvent(new Event("cart-updated"));
 
-     if (orderId) {
-       navigate(`/order-details/${orderId}`);
-     } else {
-       navigate("/customer-dashboard");
-     }
+      if (orderId) {
+        navigate(`/order-details/${orderId}`);
+      } else {
+        navigate("/customer-dashboard");
+      }
 
-     toast.success(
-       "Order placed successfully. Your farmer will review it soon.",
-     );
-   } catch (error) {
-     console.error("Checkout error:", error);
+      toast.success(
+        "Order placed successfully. Your farmer will review it soon.",
+      );
+    } catch (error) {
+      console.error("Checkout error:", error);
 
-     toast.error(
-       error.message || "Something went wrong while placing your order.",
-     );
-   } finally {
-     setIsSubmitting(false);
-   }
- };
+      toast.error(
+        error.message || "Something went wrong while placing your order.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -500,9 +502,7 @@ function CartPage() {
                 type="button"
                 onClick={() => setCheckoutOpen(false)}
                 className="grid h-10 w-10 place-items-center rounded-full bg-[#F3F8F3] text-[#173E1A]"
-              >
-            
-              </button>
+              ></button>
             </div>
 
             <form onSubmit={handleCheckoutSubmit} className="mt-6 space-y-4">

@@ -28,7 +28,6 @@ import ForgotPassword from "./pages/ForgotPassword.jsx";
 import VerifyEmail from "./pages/VerifyEmail.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
 
-
 const getStoredUser = () => {
   try {
     const rawUser = localStorage.getItem("user");
@@ -49,7 +48,12 @@ function RequireAuth({ children, allowedRole }) {
   if (allowedRole) {
     const userRole = String(user.role || user.userRole || "").toUpperCase();
     if (userRole !== String(allowedRole).toUpperCase()) {
-      return <Navigate to="/login" replace />;
+      return (
+        <Navigate
+          to={userRole === "FARMER" ? "/farmer-dashboard" : "/"}
+          replace
+        />
+      );
     }
   }
 
@@ -61,6 +65,15 @@ function AppLayout() {
   const headerRef = useRef(null);
   const [showStickyHeader, setShowStickyHeader] = useState(false);
   const hiddenLayoutRoutes = ["/farmer-dashboard", "/farmer-profile"];
+  const storedUser = getStoredUser();
+  const storedRole = String(
+    storedUser?.role || storedUser?.userRole || "",
+  ).toUpperCase();
+  const farmerRoutes = ["/farmer-dashboard", "/farmer-profile"];
+  const redirectFarmer =
+    Boolean(storedUser && localStorage.getItem("token")) &&
+    storedRole === "FARMER" &&
+    !farmerRoutes.includes(location.pathname);
 
   const shouldHideLayout = hiddenLayoutRoutes.includes(location.pathname);
 
@@ -92,6 +105,10 @@ function AppLayout() {
     return () => observer.disconnect();
   }, [location.pathname, shouldHideLayout]);
 
+  if (redirectFarmer) {
+    return <Navigate to="/farmer-dashboard" replace />;
+  }
+
   return (
     <>
       {!shouldHideLayout && <Header headerRef={headerRef} />}
@@ -120,10 +137,21 @@ function AppLayout() {
             <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/cart" element={<CartPage />} />
+            <Route
+              path="/cart"
+              element={
+                <RequireAuth allowedRole="CUSTOMER">
+                  <CartPage />
+                </RequireAuth>
+              }
+            />
             <Route
               path="/order-details/:orderId"
-              element={<OrderDetailsPage />}
+              element={
+                <RequireAuth allowedRole="CUSTOMER">
+                  <OrderDetailsPage />
+                </RequireAuth>
+              }
             />
             <Route
               path="/farmer-profile"

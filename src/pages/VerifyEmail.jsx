@@ -3,7 +3,9 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, Mail, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://marketlink-backend-abpl.onrender.com";
 
 function VerifyEmail() {
   const location = useLocation();
@@ -74,18 +76,40 @@ function VerifyEmail() {
           data.message || data.error || "Invalid or expired verification code.",
         );
       }
-      const userRole = data.user?.role?.toUpperCase();
+      const user = data.user || data.data?.user;
+      const token = data.token || data.accessToken || data.data?.token;
+      const userRole = String(
+        user?.role || user?.userRole || data.role || location.state?.role || "",
+      ).toUpperCase();
 
-      setNotice({
-        type: "success",
-        message: data.message || "Your email has been verified successfully.",
-      });
+      if (user && token) {
+        const authenticatedUser = {
+          ...user,
+          role: user.role || user.userRole || userRole,
+        };
 
-      if (userRole === "CUSTOMER") {
-        navigate("/");
-      } else if (userRole === "FARMER") {
-        navigate("/farmer-dashboard");
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(authenticatedUser));
+        window.dispatchEvent(new Event("auth-change"));
+
+        if (userRole === "CUSTOMER") {
+          navigate("/", { replace: true });
+          return;
+        }
+
+        if (userRole === "FARMER") {
+          navigate("/farmer-dashboard", { replace: true });
+          return;
+        }
       }
+
+      navigate("/login", {
+        replace: true,
+        state: {
+          email,
+          message: "Email verified. Please sign in to continue.",
+        },
+      });
     } catch (error) {
       console.error("Email verification error:", error);
 

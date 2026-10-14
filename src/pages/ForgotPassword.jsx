@@ -3,7 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Mail } from "lucide-react";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://marketlink-backend-abpl.onrender.com";
 
 function ForgotPassword() {
   const navigate = useNavigate();

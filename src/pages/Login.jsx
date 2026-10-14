@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Check } from "lucide-react";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://marketlink-backend-abpl.onrender.com";
 const apiUrl = (path) => `${API_BASE_URL}${path}`;
 
 const marketHighlights = [
@@ -27,7 +29,11 @@ const marketHighlights = [
 ];
 
 function Login() {
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const location = useLocation();
+  const [formData, setFormData] = useState({
+    email: location.state?.email || "",
+    password: "",
+  });
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState({ type: "", message: "" });
   const navigate = useNavigate();
@@ -65,13 +71,7 @@ function Login() {
       });
 
       const data = await response.json().catch(() => ({}));
-      console.log("LOGIN RESPONSE:", data);
-      console.log("LOGIN USER:", data.user);
-      console.log("LOGIN ROLE:", data.user?.role);
-      console.log("LOGIN TOKEN:", data.token);
-
       if (!response.ok) {
-        console.log("LOGIN BACKEND RESPONSE:", data);
         throw new Error(
           data.message || data.error || "Invalid email or password.",
         );
@@ -81,17 +81,24 @@ function Login() {
         throw new Error("No user returned from the server.");
       }
 
+      if (!data.token) {
+        throw new Error("The server did not return a login session.");
+      }
+
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
+      window.dispatchEvent(new Event("auth-change"));
 
-      const userRole = data.user?.role?.toUpperCase();
+      const userRole = String(
+        data.user.role || data.user.userRole || "",
+      ).toUpperCase();
 
       if (userRole === "CUSTOMER") {
-        window.location.href = "/";
+        navigate("/", { replace: true });
       } else if (userRole === "FARMER") {
-        window.location.href = "/farmer-dashboard";
+        navigate("/farmer-dashboard", { replace: true });
       } else {
-        window.location.href = "/";
+        navigate("/", { replace: true });
       }
     } catch (error) {
       console.error("login error:", error);
@@ -172,15 +179,15 @@ function Login() {
               </span>
             </div>
 
-            {notice.message ? (
+            {notice.message || location.state?.message ? (
               <div
                 className={`mt-6 rounded-xl border px-4 py-3 text-sm font-medium ${
-                  notice.type === "success"
+                  notice.type === "success" || location.state?.message
                     ? "border-[#C8E6C9] bg-[#E8F5E9] text-[#1B5E20]"
                     : "border-[#F8D7DA] bg-[#FFF1F2] text-[#B42318]"
                 }`}
               >
-                {notice.message}
+                {notice.message || location.state?.message}
               </div>
             ) : null}
 

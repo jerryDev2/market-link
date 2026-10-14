@@ -10,7 +10,9 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://marketlink-backend-abpl.onrender.com";
 
 const apiUrl = (path) => `${API_BASE_URL}${path}`;
 
@@ -148,7 +150,7 @@ const ProductPage = () => {
     return (
       <main className="min-h-screen bg-[#F7F9F3] px-5 py-16">
         <div className="mx-auto max-w-6xl">
-          <div className="flex min-h-[500px] items-center justify-center rounded-[28px] bg-white">
+          <div className="flex min-h-125 items-center justify-center rounded-[28px] bg-white">
             <div className="text-center">
               <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-[#E8F5E9] border-t-[#1B5E20]" />
 
@@ -216,13 +218,13 @@ const ProductPage = () => {
 
         <div className="grid overflow-hidden rounded-[30px] border border-[#E5EEE6] bg-white shadow-[0_20px_60px_rgba(27,94,32,0.07)] lg:grid-cols-2">
           {/* IMAGE */}
-          <section className="flex min-h-[420px] items-center justify-center bg-[#F1F7F1] p-6 sm:p-10 lg:min-h-[620px]">
-            <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-[24px] bg-white p-6">
+          <section className="flex min-h-105 items-center justify-center bg-[#F1F7F1] p-6 sm:p-10 lg:min-h-155">
+            <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-3xl bg-white p-6">
               {productData.imageUrl ? (
                 <img
                   src={productData.imageUrl}
                   alt={productData.name}
-                  className="h-full max-h-[540px] w-full object-contain transition duration-500 hover:scale-105"
+                  className="h-full max-h-135 w-full object-contain transition duration-500 hover:scale-105"
                   onError={(event) => {
                     event.currentTarget.style.display = "none";
                   }}

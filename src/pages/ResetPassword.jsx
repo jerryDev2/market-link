@@ -3,7 +3,9 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, LockKeyhole, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://marketlink-backend-abpl.onrender.com";
 
 function ResetPassword() {
   const location = useLocation();

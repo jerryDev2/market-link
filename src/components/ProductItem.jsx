@@ -3,7 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { ShoppingCart, Plus, Minus } from "lucide-react";
 import { toast } from "sonner";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://marketlink-backend-abpl.onrender.com";
 
 const apiUrl = (path) => `${API_BASE_URL}${path}`;
 

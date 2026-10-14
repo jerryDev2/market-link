@@ -1,11 +1,22 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Toaster, toast } from "sonner";
-import { Hand } from "lucide-react";
+import { Hand, RefreshCw } from "lucide-react";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://marketlink-backend-abpl.onrender.com";
 
 const apiUrl = (path) => `${API_BASE_URL}${path}`;
+const resolveImageUrl = (imageUrl) => {
+  if (!imageUrl) return "";
+
+  try {
+    return new URL(imageUrl, `${API_BASE_URL}/`).href;
+  } catch {
+    return imageUrl;
+  }
+};
 
 const navItems = [
   "Overview",
@@ -28,6 +39,7 @@ const emptyProduct = {
 };
 
 const orderStatuses = [
+  "All",
   "Pending",
   "Accepted",
   "Ready for Pickup",
@@ -91,6 +103,16 @@ const getDisplayName = (user) => {
   return "Farmer";
 };
 
+const getFarmerId = (profile, user) => {
+  return (
+    profile?.farmerId ??
+    profile?.farmer_id ??
+    profile?.id ??
+    user?.farmerId ??
+    user?.farmer_id ??
+    null
+  );
+};
 const normalizeFarmerProfile = (profile) => {
   if (!profile) {
     return null;
@@ -113,6 +135,15 @@ const normalizeFarmerProfile = (profile) => {
     "";
 
   return {
+    farmerId: profile.farmerId ?? profile.farmer_id ?? profile.id ?? null,
+
+    userId:
+      profile.userId ??
+      profile.user_id ??
+      profile.user?.userId ??
+      profile.user?.id ??
+      null,
+
     firstName,
 
     lastName,
@@ -124,16 +155,17 @@ const normalizeFarmerProfile = (profile) => {
       nestedUser.name ||
       `${firstName} ${lastName}`.trim(),
 
-    profileImage:
+    profileImage: resolveImageUrl(
       profile.profileImage ||
-      profile.avatar ||
-      profile.profileImageUrl ||
-      profile.imageUrl ||
-      nestedUser.profileImage ||
-      nestedUser.avatar ||
-      nestedUser.profileImageUrl ||
-      nestedUser.imageUrl ||
-      "",
+        profile.avatar ||
+        profile.profileImageUrl ||
+        profile.imageUrl ||
+        nestedUser.profileImage ||
+        nestedUser.avatar ||
+        nestedUser.profileImageUrl ||
+        nestedUser.imageUrl ||
+        "",
+    ),
 
     farmName:
       profile.farmName ||
@@ -172,24 +204,23 @@ const normalizeFarmerProfile = (profile) => {
   };
 };
 
-const buildOverviewCards = (productCount = 0) => [
-  {
-    label: "Products",
-    value: String(productCount),
-  },
-  {
-    label: "Orders",
-    value: "0",
-  },
-  {
-    label: "Pending",
-    value: "0",
-  },
-  {
-    label: "Revenue",
-    value: "₦0",
-  },
-];
+const buildOverviewCards = (productCount = 0, orders = []) => {
+  const pendingOrders = orders.filter(
+    (order) => String(order.status || "").toUpperCase() === "PENDING",
+  ).length;
+  const revenue = orders.reduce(
+    (total, order) =>
+      total + Number(order.totalAmount || order.total || order.amount || 0),
+    0,
+  );
+
+  return [
+    { label: "Products", value: String(productCount) },
+    { label: "Orders", value: String(orders.length) },
+    { label: "Pending", value: String(pendingOrders) },
+    { label: "Revenue", value: `₦${revenue.toLocaleString("en-NG")}` },
+  ];
+};
 
 function FarmerDashboard() {
   const navigate = useNavigate();
@@ -199,6 +230,14 @@ function FarmerDashboard() {
   const [storedUser, setStoredUser] = useState(() => getStoredUser());
 
   const [products, setProducts] = useState([]);
+
+  const [orders, setOrders] = useState([]);
+
+  const [ordersLoading, setOrdersLoading] = useState(false);
+
+  const [ordersError, setOrdersError] = useState("");
+
+  const [activeOrderStatus, setActiveOrderStatus] = useState("All");
 
   const [showProductForm, setShowProductForm] = useState(false);
 
@@ -358,13 +397,16 @@ function FarmerDashboard() {
       const normalizedProducts = productList.map((item) => ({
         id: item.productId || item.id || Math.random().toString(36).slice(2),
 
-        image:
+        image: resolveImageUrl(
           item.imageUrl ||
-          item.image ||
-          item.productImage ||
-          item.image_path ||
-          item.photo ||
-          "",
+            item.image ||
+            item.productImage ||
+            item.image_path ||
+            item.imagePath ||
+            item.image_url ||
+            item.photo ||
+            "",
+        ),
 
         name: item.name || "Unnamed product",
 
@@ -389,10 +431,71 @@ function FarmerDashboard() {
     }
   };
 
+  const loadOrders = useCallback(async () => {
+    const token = localStorage.getItem("token");
+    const farmerId = getFarmerId(user);
+
+    if (!token || !farmerId) {
+      setOrders([]);
+      setOrdersError(
+        "Farmer account details are missing. Please sign in again.",
+      );
+      return;
+    }
+
+    try {
+      setOrdersLoading(true);
+      setOrdersError("");
+
+      const response = await fetch(apiUrl(`/api/orders/farmer/${farmerId}`), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Unable to load orders (${response.status})`);
+      }
+
+      const payload = await response.json();
+      const orderList = Array.isArray(payload)
+        ? payload
+        : payload.orders ||
+          payload.data?.orders ||
+          payload.content ||
+          payload.data?.content ||
+          payload.results ||
+          payload.data?.results ||
+          payload.data ||
+          [];
+
+      setOrders(Array.isArray(orderList) ? orderList : []);
+    } catch (error) {
+      console.error("Farmer order loading error:", error);
+      setOrders([]);
+      setOrdersError(error.message || "Unable to load customer orders.");
+    } finally {
+      setOrdersLoading(false);
+    }
+  }, [user]);
+
   useEffect(() => {
     loadProducts();
-    getFarmerProfile();
+
+    const initializeDashboard = async () => {
+      const profile = await getFarmerProfile();
+      await loadOrders(profile);
+    };
+
+    initializeDashboard();
   }, []);
+  useEffect(() => {
+    if (activeTab !== "Orders") return undefined;
+
+    const intervalId = window.setInterval(() => {
+      loadOrders();
+    }, 15000);
+
+    return () => window.clearInterval(intervalId);
+  }, [activeTab, loadOrders]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -755,8 +858,8 @@ function FarmerDashboard() {
   }));
 
   const overviewCards = useMemo(
-    () => buildOverviewCards(products.length),
-    [products.length],
+    () => buildOverviewCards(products.length, orders),
+    [products.length, orders],
   );
 
   const headerLabel = useMemo(() => {
@@ -819,7 +922,29 @@ function FarmerDashboard() {
       <div className="rounded-[22px] border border-[#E7F1E8] bg-white p-5 shadow-[0_12px_28px_rgba(27,94,32,0.06)]">
         <h3 className="mb-3 text-xl font-bold text-[#173E1A]">Recent Orders</h3>
 
-        <p className="text-sm text-[#4A5E4F]">No recent orders yet.</p>
+        {ordersLoading ? (
+          <p className="text-sm text-[#4A5E4F]">Loading orders...</p>
+        ) : orders.length > 0 ? (
+          <div className="space-y-3">
+            {orders.slice(0, 3).map((order, index) => (
+              <div
+                key={order.orderId || order.id || index}
+                className="flex items-center justify-between gap-3 border-t border-[#EDF4EE] pt-3 text-sm"
+              >
+                <span className="font-medium text-[#173E1A]">
+                  Order #{order.orderId || order.id || index + 1}
+                </span>
+                <span className="text-[#4A5E4F]">
+                  {order.status || "Pending"}
+                </span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-[#4A5E4F]">
+            {ordersError || "No customer orders yet."}
+          </p>
+        )}
       </div>
 
       <div className="rounded-[22px] border border-[#E7F1E8] bg-white p-5 shadow-[0_12px_28px_rgba(27,94,32,0.06)]">
@@ -1061,30 +1186,145 @@ function FarmerDashboard() {
   |--------------------------------------------------------------------------
   */
 
-  const renderOrders = () => (
-    <div className="space-y-5">
-      <h2 className="text-3xl font-bold text-[#173E1A]">Orders</h2>
+  const renderOrders = () => {
+    const filteredOrders = orders.filter((order) => {
+      if (activeOrderStatus === "All") return true;
+      return (
+        String(order.status || "Pending")
+          .replace(/[_-]/g, " ")
+          .toLowerCase() === activeOrderStatus.toLowerCase()
+      );
+    });
 
-      <div className="flex flex-wrap gap-2">
-        {orderStatuses.map((status) => (
+    return (
+      <div className="space-y-5">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-3xl font-bold text-[#173E1A]">Customer Orders</h2>
           <button
-            key={status}
-            className="rounded-full bg-[#EAF3EB] px-4 py-2 text-sm font-semibold text-[#1B5E20]"
+            type="button"
+            onClick={loadOrders}
+            disabled={ordersLoading}
+            aria-label="Refresh orders"
+            title="Refresh orders"
+            className="grid h-10 w-10 place-items-center rounded-lg border border-[#1B5E20] text-[#1B5E20] disabled:opacity-50"
           >
-            {status}
+            <RefreshCw
+              size={17}
+              className={ordersLoading ? "animate-spin" : ""}
+            />
           </button>
-        ))}
-      </div>
+        </div>
 
-      <div className="rounded-[22px] border border-[#E7F1E8] bg-white p-5">
-        <h3 className="text-xl font-bold text-[#173E1A]">No orders yet</h3>
+        <div className="flex flex-wrap gap-2">
+          {orderStatuses.map((status) => (
+            <button
+              key={status}
+              type="button"
+              onClick={() => setActiveOrderStatus(status)}
+              aria-pressed={activeOrderStatus === status}
+              className={`rounded-full px-4 py-2 text-sm font-semibold ${
+                activeOrderStatus === status
+                  ? "bg-[#1B5E20] text-white"
+                  : "bg-[#EAF3EB] text-[#1B5E20]"
+              }`}
+            >
+              {status}
+            </button>
+          ))}
+        </div>
 
-        <p className="mt-3 text-sm text-[#4A5E4F]">
-          Customer orders will appear here.
-        </p>
+        {ordersLoading ? (
+          <p className="rounded-[22px] border border-[#E7F1E8] bg-white p-5 text-sm text-[#4A5E4F]">
+            Loading customer orders...
+          </p>
+        ) : ordersError ? (
+          <p
+            role="alert"
+            className="rounded-[22px] border border-red-200 bg-white p-5 text-sm text-red-700"
+          >
+            {ordersError}
+          </p>
+        ) : filteredOrders.length === 0 ? (
+          <p className="rounded-[22px] border border-[#E7F1E8] bg-white p-5 text-sm text-[#4A5E4F]">
+            {orders.length === 0
+              ? "Customer orders will appear here."
+              : `There are no ${activeOrderStatus.toLowerCase()} orders.`}
+          </p>
+        ) : (
+          <div className="space-y-4">
+            {filteredOrders.map((order, index) => {
+              const customer = order.customer || order.user || {};
+              const customerName =
+                order.customerName ||
+                `${customer.firstName || ""} ${customer.lastName || ""}`.trim() ||
+                customer.name ||
+                "Customer";
+              const items = Array.isArray(order.items)
+                ? order.items
+                : Array.isArray(order.orderItems)
+                  ? order.orderItems
+                  : Array.isArray(order.products)
+                    ? order.products
+                    : [];
+
+              return (
+                <article
+                  key={order.orderId || order.id || index}
+                  className="rounded-[18px] border border-[#E7F1E8] bg-white p-5"
+                >
+                  <div className="flex flex-wrap justify-between gap-3">
+                    <div>
+                      <h3 className="font-bold text-[#173E1A]">
+                        Order #{order.orderId || order.id || index + 1}
+                      </h3>
+                      <p className="mt-1 text-sm text-[#4A5E4F]">
+                        Customer: {customerName}
+                      </p>
+                      {(order.phoneNumber || order.customerPhone) && (
+                        <p className="mt-1 text-sm text-[#4A5E4F]">
+                          Phone: {order.phoneNumber || order.customerPhone}
+                        </p>
+                      )}
+                    </div>
+                    <span className="h-fit rounded-full bg-[#EAF3EB] px-3 py-1 text-sm font-semibold text-[#1B5E20]">
+                      {order.status || "Pending"}
+                    </span>
+                  </div>
+                  <ul className="mt-4 space-y-1 border-t border-[#EDF4EE] pt-3 text-sm text-[#2F443B]">
+                    {items.map((item, itemIndex) => (
+                      <li key={item.orderItemId || item.id || itemIndex}>
+                        {item.productName ||
+                          item.product?.name ||
+                          item.name ||
+                          "Product"}
+                        {` x${item.quantity || 1}`}
+                      </li>
+                    ))}
+                    {items.length === 0 && <li>Order items unavailable.</li>}
+                  </ul>
+                  <div className="mt-4 flex flex-wrap justify-between gap-2 border-t border-[#EDF4EE] pt-3 text-sm">
+                    <span className="text-[#4A5E4F]">
+                      Pickup:{" "}
+                      {order.pickupPlace ||
+                        order.deliveryAddress ||
+                        order.address ||
+                        "Not provided"}
+                    </span>
+                    <span className="font-bold text-[#173E1A]">
+                      ₦
+                      {Number(
+                        order.totalAmount || order.total || order.amount || 0,
+                      ).toLocaleString("en-NG")}
+                    </span>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
       </div>
-    </div>
-  );
+    );
+  };
 
   /*
   |--------------------------------------------------------------------------
@@ -1556,6 +1796,14 @@ function FarmerDashboard() {
                           loadProducts();
 
                           setActiveTab("Products");
+
+                          return;
+                        }
+
+                        if (item === "Orders") {
+                          loadOrders();
+
+                          setActiveTab("Orders");
 
                           return;
                         }

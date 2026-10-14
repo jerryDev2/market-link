@@ -13,7 +13,9 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://marketlink-backend-abpl.onrender.com";
 
 const apiUrl = (path) => `${API_BASE_URL}${path}`;
 
@@ -132,58 +134,58 @@ function CustomerDashboard() {
      LOAD FARMER ORDERS
   -------------------------------------------------- */
 
-  const loadOrders = async () => {
-    if (!token || !userId) {
-      navigate("/login", { replace: true });
-      return;
-    }
+  const loadOrders = useCallback(
+    async (profileOverride = null) => {
+      const token = localStorage.getItem("token");
 
-    try {
-      setLoadingOrders(true);
-      setError("");
+      const farmerId =
+        getFarmerId(profileOverride, user) ?? getFarmerId(farmerProfile, user);
 
-      const response = await fetch(
-        `${API_BASE_URL}/api/orders/user/${userId}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      if (response.status === 401 || response.status === 403) {
-        localStorage.removeItem("token");
-
-        toast.error("Your session has expired. Please login again.");
-
-        navigate("/login", { replace: true });
+      if (!token || !farmerId) {
+        setOrders([]);
+        setOrdersError(
+          "Farmer ID is missing. Please check your farmer profile.",
+        );
         return;
       }
 
-      if (!response.ok) {
-        throw new Error(`Unable to load orders (${response.status})`);
+      try {
+        setOrdersLoading(true);
+        setOrdersError("");
+
+        const response = await fetch(apiUrl(`/api/orders/farmer/${farmerId}`), {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Unable to load orders (${response.status})`);
+        }
+
+        const payload = await response.json();
+
+        const orderList = Array.isArray(payload)
+          ? payload
+          : (payload.orders ??
+            payload.data?.orders ??
+            payload.content ??
+            payload.data?.content ??
+            payload.results ??
+            payload.data?.results ??
+            payload.data ??
+            []);
+
+        setOrders(Array.isArray(orderList) ? orderList : []);
+      } catch (error) {
+        console.error("Farmer order loading error:", error);
+        setOrdersError(error.message || "Unable to load customer orders.");
+      } finally {
+        setOrdersLoading(false);
       }
-
-      const data = await response.json();
-      console.log("userId", )
-
-      console.log("Farmer orders:", data);
-
-      setOrders(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error("Order loading error:", err);
-
-      setError("Unable to load your orders.");
-
-      setOrders([]);
-
-      toast.error("Something went wrong while loading your orders.");
-    } finally {
-      setLoadingOrders(false);
-    }
-  };
+    },
+    [user, farmerProfile],
+  );
 
   /* --------------------------------------------------
      LOAD ORDERS WHEN DASHBOARD OPENS
